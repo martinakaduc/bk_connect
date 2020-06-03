@@ -1,3 +1,5 @@
+import 'package:bkconnect/view/components/button.dart';
+import 'package:bkconnect/view/components/header_bar.dart';
 import 'package:bkconnect/view/components/image.dart';
 import 'package:flutter/material.dart';
 
@@ -9,18 +11,19 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      if (index == 2) return;
+      this._selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MainScreen object that was created by
-        // the App.build method, and use it to set our appbar title.
         automaticallyImplyLeading: false,
         leading: Padding(
           padding: const EdgeInsets.only(left: 20.0),
@@ -29,46 +32,75 @@ class _MainScreenState extends State<MainScreen> {
             'assets/images/BK image.png',
           ),
         ),
-        title: RichText(
-            text: TextSpan(children: [
-          TextSpan(
-              style: const TextStyle(
-                  color: const Color(0xff042b92),
-                  fontWeight: FontWeight.w700,
-                  fontFamily: "Roboto",
-                  fontStyle: FontStyle.normal,
-                  fontSize: 36.0),
-              text: "BK "),
-          TextSpan(
-              style: const TextStyle(
-                  color: const Color(0xff1588db),
-                  fontWeight: FontWeight.w700,
-                  fontFamily: "Roboto",
-                  fontStyle: FontStyle.normal,
-                  fontSize: 36.0),
-              text: "Connect")
-        ])),
+        title: HomeTitle(),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: SingleChildScrollView(
+        child: Stack(
+          children: <Widget>[
+            Container(
+              width: 375,
+              height: 74,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Button(
+                    "Camera",
+                    160,
+                    48,
+                    onTapFunction: () {},
+                  ),
+                  SizedBox(width: 30),
+                  Button(
+                    "Gallery",
+                    160,
+                    48,
+                    color: Color(0xffe0e0e0),
+                    onTapFunction: () {},
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+//        tooltip: 'Camera',
+        child: Icon(Icons.camera),
+        elevation: 2.0,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xe5ffffff),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            title: Text('Home'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            title: Text('Nearby'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            title: Text('Camera'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            title: Text('News'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            title: Text('Profile'),
+          ),
+        ],
+        currentIndex: this._selectedIndex,
+        selectedItemColor: Color(0xff1588db),
+        onTap: this._onItemTapped,
       ),
     );
   }
