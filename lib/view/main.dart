@@ -20,6 +20,9 @@ class BKConnect extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        appBarTheme: AppBarTheme(
+          color: Color(0xe5ffffff),
+        ),
       ),
       home: WelcomeScreen(),
     );

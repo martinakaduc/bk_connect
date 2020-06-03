@@ -1,3 +1,4 @@
+import 'package:bkconnect/view/components/image.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -20,7 +21,33 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         // Here we take the value from the MainScreen object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("BK Connect"),
+        automaticallyImplyLeading: false,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 20.0),
+          child: GeneralImage(
+            75,
+            'assets/images/BK image.png',
+          ),
+        ),
+        title: RichText(
+            text: TextSpan(children: [
+          TextSpan(
+              style: const TextStyle(
+                  color: const Color(0xff042b92),
+                  fontWeight: FontWeight.w700,
+                  fontFamily: "Roboto",
+                  fontStyle: FontStyle.normal,
+                  fontSize: 36.0),
+              text: "BK "),
+          TextSpan(
+              style: const TextStyle(
+                  color: const Color(0xff1588db),
+                  fontWeight: FontWeight.w700,
+                  fontFamily: "Roboto",
+                  fontStyle: FontStyle.normal,
+                  fontSize: 36.0),
+              text: "Connect")
+        ])),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it

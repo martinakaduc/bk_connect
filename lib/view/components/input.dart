@@ -2,21 +2,28 @@
 import 'package:flutter/material.dart';
 
 class InputField extends StatelessWidget {
-  InputField(String label, String hint, String iconImage) {
+  InputField(String label, String hint,
+      {this.isPassword = false,
+      this.icon,
+      this.onSave,
+      this.validator,
+      this.keyboardType}) {
     this.label = label;
     this.hint = hint;
-    this.iconImage = iconImage;
   }
 
   String label;
   String hint;
-  String iconImage;
+  bool isPassword;
+  Icon icon;
+  FormFieldSetter<String> onSave;
+  FormFieldValidator<String> validator;
+  TextInputType keyboardType;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 335,
-      height: 75,
+      height: 90,
       child: Column(
         children: <Widget>[
           Row(
@@ -38,51 +45,44 @@ class InputField extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                width: 50,
-                height: 50,
-                child: Image(image: AssetImage(this.iconImage)),
-              ),
-              Container(
-                width: 285,
-                height: 50,
-                child: TextField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(60)),
-                      borderSide:
-                          BorderSide(color: Colors.blueAccent, width: 1),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(60)),
-                      borderSide: BorderSide(color: Colors.black, width: 1),
-                    ),
-                    hintStyle: TextStyle(
-                      color: const Color(0xffbdbdbd),
-                      fontWeight: FontWeight.w600,
-                      fontFamily: "Roboto",
-                      fontStyle: FontStyle.normal,
-                      fontSize: 20.0,
-                    ),
-                    hintText: this.hint,
-                    contentPadding:
-                        const EdgeInsets.only(left: 20.0, right: 20.0),
-                  ),
-                  keyboardType: TextInputType.text,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: "Roboto",
-                    fontStyle: FontStyle.normal,
-                    fontSize: 20.0,
-                  ),
+          Container(
+            width: 360,
+            height: 65,
+            child: TextFormField(
+              obscureText: this.isPassword,
+              keyboardType: this.keyboardType,
+              decoration: InputDecoration(
+                icon: this.icon,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(60)),
+                  borderSide: BorderSide(color: Colors.blueAccent, width: 1),
                 ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(60)),
+                  borderSide: BorderSide(color: Colors.black, width: 1),
+                ),
+                hintStyle: TextStyle(
+                  color: const Color(0xffbdbdbd),
+                  fontWeight: FontWeight.w600,
+                  fontFamily: "Roboto",
+                  fontStyle: FontStyle.normal,
+                  fontSize: 20.0,
+                ),
+                hintText: this.hint,
+                counterText: ' ',
+                contentPadding: const EdgeInsets.only(left: 20.0, right: 20.0),
               ),
-            ],
-          )
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+                fontFamily: "Roboto",
+                fontStyle: FontStyle.normal,
+                fontSize: 20.0,
+              ),
+              validator: this.validator,
+              onSaved: this.onSave,
+            ),
+          ),
         ],
       ),
     );
