@@ -41,5 +41,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+    <string>Bạn cần cho phép truy cập camera để nhận dạng!</string>
+
 </dict>
 </plist>

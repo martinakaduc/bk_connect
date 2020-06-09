@@ -96,8 +96,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             onTapFunction: () {
                               if (_key.currentState.validate()) {
                                 _key.currentState.save();
-                                print("Name: ${_info.getName()}");
-                                print("Password: ${_info.getPassword()}");
+                                  print("Name: ${_info.getUserName()}");
+                                  print("Password: ${_info.getPassword()}");
                               }
 
                               Navigator.push(

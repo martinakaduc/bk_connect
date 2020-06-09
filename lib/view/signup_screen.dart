@@ -167,7 +167,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               onTapFunction: () {
                                 if (_key.currentState.validate()) {
                                   _key.currentState.save();
-                                  print("Username: ${_info.getName()}");
+                                  print("Username: ${_info.getUserName()}");
                                   print("ID: ${_info.getID()}");
                                   print("Email: ${_info.getEmail()}");
                                   print("Phone: ${_info.getPhone()}");

@@ -1,4 +1,5 @@
 // Bao gồm header trên Home và header bên notìication
+import 'package:bkconnect/view/components/image.dart';
 import 'package:flutter/material.dart';
 
 class HomeTitle extends StatelessWidget {
@@ -32,5 +33,25 @@ class HomeTitle extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+AppBar mainAppBar(int index) {
+  if (index == 0) {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 20.0),
+        child: GeneralImage(
+          75,
+          'assets/images/BK image.png',
+        ),
+      ),
+      title: HomeTitle(),
+    );
+  } else if (index == 3) {
+    return AppBar();
+  } else {
+    return null;
   }
 }

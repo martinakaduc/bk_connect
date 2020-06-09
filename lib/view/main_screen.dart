@@ -1,6 +1,9 @@
-import 'package:bkconnect/view/components/button.dart';
+import 'package:bkconnect/view/camera.dart';
 import 'package:bkconnect/view/components/header_bar.dart';
-import 'package:bkconnect/view/components/image.dart';
+import 'package:bkconnect/view/home_page.dart';
+import 'package:bkconnect/view/nearby_page.dart';
+import 'package:bkconnect/view/news_page.dart';
+import 'package:bkconnect/view/profile_page.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -12,66 +15,52 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  List<Widget> _pages;
 
-  void _onItemTapped(int index) {
+  Function _onItemTapped(int index) {
     setState(() {
-      if (index == 2) return;
+      if (index == 2) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CameraView()),
+        );
+        return null;
+      }
       this._selectedIndex = index;
     });
+    return null;
+  }
+
+  @override
+  void initState() {
+    this._selectedIndex = 0;
+    this._pages = [
+      HomePage(),
+      NearbyPage(),
+      null,
+      NewsPage(),
+      ProfilePage(),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 20.0),
-          child: GeneralImage(
-            75,
-            'assets/images/BK image.png',
-          ),
-        ),
-        title: HomeTitle(),
-      ),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            Container(
-              width: 375,
-              height: 74,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: Colors.white),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Button(
-                    "Camera",
-                    160,
-                    48,
-                    onTapFunction: () {},
-                  ),
-                  SizedBox(width: 30),
-                  Button(
-                    "Gallery",
-                    160,
-                    48,
-                    color: Color(0xffe0e0e0),
-                    onTapFunction: () {},
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: mainAppBar(this._selectedIndex),
+      body: this._pages[this._selectedIndex],
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-//        tooltip: 'Camera',
-        child: Icon(Icons.camera),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CameraView()),
+          );
+        },
+        tooltip: 'Camera',
+        child: Icon(Icons.camera_alt),
         elevation: 2.0,
+        backgroundColor: const Color(0xff1588db),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -99,7 +88,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
         currentIndex: this._selectedIndex,
-        selectedItemColor: Color(0xff1588db),
+        fixedColor: const Color(0xff1588db),
         onTap: this._onItemTapped,
       ),
     );

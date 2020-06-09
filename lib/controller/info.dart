@@ -43,7 +43,7 @@ class UserInfo {
     return _id;
   }
 
-  String getName() {
+  String getUserName() {
     return _username;
   }
 
@@ -57,5 +57,42 @@ class UserInfo {
 
   String getPassword() {
     return _password;
+  }
+}
+
+class MemberInfo {
+  String _id;
+  String _name;
+  String _phone;
+  String _email;
+  String _faculty;
+
+  MemberInfo(
+      {String id, String name, String phone, String email, String faculty}) {
+    _id = id;
+    _name = name;
+    _phone = phone;
+    _email = email;
+    _faculty = faculty;
+  }
+
+  String getID() {
+    return _id;
+  }
+
+  String getName() {
+    return _name;
+  }
+
+  String getPhone() {
+    return _phone;
+  }
+
+  String getEmail() {
+    return _email;
+  }
+
+  String getFaculty() {
+    return _faculty;
   }
 }
