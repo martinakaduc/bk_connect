@@ -8,6 +8,11 @@ import 'package:bkconnect/view/main_screen.dart';
 import 'package:bkconnect/view/signup_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:bkconnect/controller/authencation.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 class LoginScreen extends StatefulWidget {
   LoginScreen() : super();
@@ -22,10 +27,64 @@ class _LoginScreenState extends State<LoginScreen> {
   GlobalKey<FormState> _key = GlobalKey<FormState>();
   UserInfo _info = UserInfo();
 
+  Authentication _auth = Authentication();
+
+  void submitCallback(http.Response response) {
+    print(response.body);
+    var msg = json.decode(response.body);
+    if(msg["status"] == "success") {
+      var storage = FlutterSecureStorage();
+      storage.write(key: "token", value: msg["access_token"]);      
+      Navigator.push(
+        context, 
+        MaterialPageRoute(builder: (context) => MainScreen())
+      );
+    }
+    else {
+      showAlertDialog(msg);
+    }
+  } 
+
+  void showAlertDialog(Map<String, dynamic> msg) {
+    showDialog(
+      context: context,
+      child: new AlertDialog(
+        title: Text(
+          msg["status"],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 30,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          msg["message"],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 30,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        actions: [
+          new FlatButton(
+            child: const Text("OK"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );                  
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: Container(
+        alignment: Alignment.center,
+        color: Colors.white,
         child: Column(
           children: <Widget>[
             SizedBox(height: 30),
@@ -93,18 +152,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             124,
                             48,
                             fontSize: 20,
-                            onTapFunction: () {
+                            onTapFunction: () async {
                               if (_key.currentState.validate()) {
                                 _key.currentState.save();
-                                  print("Name: ${_info.getUserName()}");
-                                  print("Password: ${_info.getPassword()}");
+                                try {
+                                  var response = await _auth.signIn(_info);
+                                  submitCallback(response);
+                                } catch(e) {
+                                  print(e);
+                                  var msg = {"status": "failure", "message": "lost connection"};
+                                  showAlertDialog(msg);
+                                }
                               }
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MainScreen()),
-                              );
                             },
                           ),
                         ],

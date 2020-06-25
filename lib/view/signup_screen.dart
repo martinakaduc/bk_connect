@@ -2,9 +2,11 @@ import 'package:bkconnect/controller/info.dart';
 import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/view/components/input.dart';
-import 'package:bkconnect/view/main_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:bkconnect/controller/authencation.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignupScreen extends StatefulWidget {
   SignupScreen() : super();
@@ -19,25 +21,64 @@ class _SignupScreenState extends State<SignupScreen> {
   GlobalKey<FormState> _key = GlobalKey<FormState>();
   UserInfo _info = UserInfo();
 
+  Authentication _auth = Authentication();
+
+  void submitCallback(http.Response response) {
+    print(response.body);
+    var msg = json.decode(response.body);
+    showAlertDialog(msg);
+  } 
+
+  void showAlertDialog(Map<String, dynamic> msg) {
+    showDialog(
+      context: context,
+      child: new AlertDialog(
+        title: Text(
+          msg["status"],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: msg["status"] == "success" ? Colors.blue : Colors.red,
+            fontSize: 30,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          msg["message"],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 30,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        actions: [
+          new FlatButton(
+            child: const Text("OK"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );                  
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
+      body: Container(
+        alignment: Alignment.center,
+        color: Colors.white,
+        child: Stack(
           children: <Widget>[
-            SizedBox(height: 30),
-            GeneralImage(
-              128,
-              'assets/images/BK image.png',
-            ),
-            SizedBox(height: 20),
             Form(
               key: _key,
-              child: Expanded(
-                child: ListView(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
+              child: SingleChildScrollView(
+                child: Column(
                   children: <Widget>[
+                    SizedBox(
+                      height: 178,
+                    ),
                     InputField(
                       "Username",
                       "Enter username",
@@ -164,21 +205,18 @@ class _SignupScreenState extends State<SignupScreen> {
                               124,
                               48,
                               fontSize: 20,
-                              onTapFunction: () {
+                              onTapFunction: () async {
                                 if (_key.currentState.validate()) {
                                   _key.currentState.save();
-                                  print("Username: ${_info.getUserName()}");
-                                  print("ID: ${_info.getID()}");
-                                  print("Email: ${_info.getEmail()}");
-                                  print("Phone: ${_info.getPhone()}");
-                                  print("Password: ${_info.getPassword()}");
+                                  try {
+                                    var response = await _auth.signUp(_info);
+                                    submitCallback(response);
+                                  } catch(e) {
+                                    print(e);
+                                    var msg = {"status": "failure", "message": "lost connection"};
+                                    showAlertDialog(msg);
+                                  }
                                 }
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MainScreen()),
-                                );
                               },
                             ),
                           ],
@@ -188,6 +226,17 @@ class _SignupScreenState extends State<SignupScreen> {
                     SizedBox(height: 10),
                   ],
                 ),
+              ),
+            ),
+            Container(
+              color: Colors.white.withOpacity(1.0),
+              width: MediaQuery.of(context).size.width,
+              height: 178,
+              padding: EdgeInsets.only(top: 30, bottom: 20),
+              alignment: Alignment.topCenter,
+              child: GeneralImage(
+                128,
+                'assets/images/BK image.png',
               ),
             ),
           ],

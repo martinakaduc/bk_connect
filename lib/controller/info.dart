@@ -1,4 +1,7 @@
 // Cấu trúc user info, và các phươnng thức get user info, dùng network_helper
+import 'dart:convert';
+
+
 class UserInfo {
   String _id;
   String _username;
@@ -57,6 +60,37 @@ class UserInfo {
 
   String getPassword() {
     return _password;
+  }
+
+  static UserInfo fromMap(Map<String, dynamic> info) {
+    return UserInfo(
+      username: info["username"],
+      id: info["id"],
+      email: info["email"],
+      phone: info["phone"],
+      password: info["password"]
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    final info = {
+      "username": _username,
+      "id": _id,
+      "email": _email,
+      "phone": _phone,
+      "password": _password,
+    };
+    return info;
+  }
+
+  static UserInfo fromJson(String jsonString) {
+    final info = json.decode(jsonString);
+    return UserInfo.fromMap(info);
+  }
+
+  String toJson() {
+    final info = this.toMap();
+    return json.encode(info);
   }
 }
 

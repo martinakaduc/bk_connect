@@ -21,7 +21,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: Container(
+        alignment: Alignment.center,
+        color: Colors.white,
         child: Column(
           children: <Widget>[
             SizedBox(height: 30),
