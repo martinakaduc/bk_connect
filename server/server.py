@@ -12,9 +12,9 @@ jwt = JWTManager(app)
 
 infoManager = InfoManager()
 
-#@app.route("/test/", methods=["GET"])
-#def test():
-#    return "Hello World"
+@app.route("/test/", methods=["GET"])
+def test():
+    return "Hello World"
 
 #@app.route("/printDB/", methods=["GET"])
 #def printDB():

@@ -20,7 +20,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             SizedBox(height: 120),
             GeneralImage(
               180,
-              'assets/images/BK image.png',
+              'assets/images/BK_image.png',
             ),
             // BK Connect
             Text(

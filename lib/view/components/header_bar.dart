@@ -44,7 +44,7 @@ AppBar mainAppBar(int index) {
         padding: const EdgeInsets.only(left: 20.0),
         child: GeneralImage(
           75,
-          'assets/images/BK image.png',
+          'assets/images/BK_image.png',
         ),
       ),
       title: HomeTitle(),

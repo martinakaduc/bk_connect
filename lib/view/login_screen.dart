@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(height: 30),
             GeneralImage(
               128,
-              'assets/images/BK image.png',
+              'assets/images/BK_image.png',
             ),
             SizedBox(height: 60),
             Form(
