@@ -50,7 +50,7 @@ AppBar mainAppBar(int index) {
       title: HomeTitle(),
     );
   } else if (index == 3) {
-    return AppBar();
+    return null;
   } else {
     return null;
   }

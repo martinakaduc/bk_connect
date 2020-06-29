@@ -35,7 +35,7 @@ def login():
         return jsonify(msg)
     
     if infoManager.authorizeSignIn(username=user["username"], password=user["password"]):
-        token = create_access_token(identity=user["username"], expires_delta=datetime.timedelta(minutes=1.0))
+        token = create_access_token(identity=user["username"], expires_delta=datetime.timedelta(days=1))
         msg = {
             "status": "success",
             "message": "loged in successfully",
