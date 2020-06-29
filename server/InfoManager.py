@@ -3,7 +3,7 @@ import pymongo, urllib.parse
 
 class InfoManager:
     def __init__(self):
-        self._client = pymongo.MongoClient("mongodb://localhost:27017/")
+        self._client = pymongo.MongoClient("mongodb+srv://MyStic:asdsasfd@mysticdb-b06ey.mongodb.net/mydatabase?retryWrites=true&w=majority")
         self._db = self._client["mydatabase"]
         self._collection = self._db["users"]
 
