@@ -52,13 +52,39 @@ class _CameraViewState extends State<CameraView> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           // If the Future is complete, display the preview.
-          return Transform.scale(
-            scale: _controller.value.aspectRatio / deviceRatio,
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: CameraPreview(_controller), //cameraPreview
+          return Scaffold(
+            body: Transform.scale(
+              scale: _controller.value.aspectRatio / deviceRatio,
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: CameraPreview(_controller), //cameraPreview
+                ),
               ),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endDocked,
+            floatingActionButton: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 30,
+                ),
+                Opacity(
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    tooltip: 'Exit',
+                    child: Icon(
+                      Icons.cancel,
+                      size: 40,
+                    ),
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                  ),
+                  opacity: 0.5,
+                ),
+              ],
             ),
           );
         } else {
