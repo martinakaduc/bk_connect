@@ -1,8 +1,9 @@
-from flask import Flask,request,jsonify
-from InfoManager import InfoManager
-from flask_jwt_extended import JWTManager
-from flask_jwt_extended import (create_access_token, jwt_required, get_jwt_identity, get_raw_jwt)
 import datetime
+from flask import Flask, request, jsonify
+from flask_jwt_extended import JWTManager
+from flask_jwt_extended import (create_access_token, jwt_required, get_jwt_identity)
+
+from InfoManager import InfoManager
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'this is a secret key'
@@ -80,4 +81,4 @@ def send_profile():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,host='localhost', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

@@ -1,12 +1,14 @@
+import 'dart:convert';
+
+import 'package:bkconnect/controller/config.dart';
 import 'package:bkconnect/controller/info.dart';
 import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
+import 'package:bkconnect/view/components/text.dart';
 import 'package:bkconnect/view/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:bkconnect/view/components/text.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
   ProfilePage() : super();
@@ -107,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<dynamic> getProfile() async {
     var storage = FlutterSecureStorage();
     var token = await storage.read(key: "token");
-    return await http.get("http://localhost:5000/profile/",
+    return await http.get(base_url + "/profile/",
         headers: {"Authorization": "Bearer $token"});
   }
 
