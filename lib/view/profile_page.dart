@@ -187,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: <Widget>[
                   GeneralImage(
                     MediaQuery.of(context).size.width * 0.5,
-                    'assets/images/TC_avatar.png',
+                    'assets/images/TC_Avatar.png',
                     round: true,
                   ),
                   _infoLabel(),

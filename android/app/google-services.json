@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1081987717245",
+    "firebase_url": "https://fir-flutter-35146.firebaseio.com",
+    "project_id": "fir-flutter-35146",
+    "storage_bucket": "fir-flutter-35146.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081987717245:android:30c34ac10cebdfd39c3914",
+        "android_client_info": {
+          "package_name": "com.hcmut.bkconnect"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1081987717245-0oa5q3ranh2bgh7brkphc9rd6p78u3l9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtYM_ViOrkjIRVGF-0qjfqvmca6RFdF4I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1081987717245-0oa5q3ranh2bgh7brkphc9rd6p78u3l9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
