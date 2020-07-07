@@ -1,10 +1,18 @@
+import 'dart:convert';
+
+import 'package:bkconnect/controller/config.dart';
 import 'package:bkconnect/view/utils.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
-
+// import '../image.dart';
 import 'detector_painters.dart';
 import 'utils.dart';
+import 'package:image/image.dart' as imglib;
+import 'dart:math';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class CameraView extends StatefulWidget {
   CameraView() : super();
@@ -20,6 +28,7 @@ class _CameraViewState extends State<CameraView> {
   bool _isDetecting = false;
   dynamic _scanResults;
   CameraLensDirection _direction = CameraLensDirection.back;
+  dynamic _image;
   @override
   void initState() {
     super.initState();
@@ -29,7 +38,10 @@ class _CameraViewState extends State<CameraView> {
   void _initializeCamera() async {
     // final cameras = await availableCameras();
     // final firstCamera = cameras.first;
-
+    // await PermissionHandler().requestPermissions(<PermissionGroup>[
+    //   PermissionGroup.camera,
+    //   PermissionGroup.storage,
+    // ]);
     CameraDescription description = await getCamera(_direction);
     ImageRotation rotation = rotationIntToImageRotation(
       description.sensorOrientation,
@@ -59,6 +71,10 @@ class _CameraViewState extends State<CameraView> {
         },
       ).catchError((_) {
         _isDetecting = false;
+      }).then((_) {
+        setState(() {
+          _image = image;
+        });
       });
     });
   }
@@ -84,6 +100,94 @@ class _CameraViewState extends State<CameraView> {
     return CustomPaint(
       painter: painter,
     );
+  }
+
+  void cropFaceFromImage(CameraImage image) async {
+    int index = 0;
+    int maxSize = 0;
+    int i = 0;
+    for (Face face in _scanResults) {
+      int size =
+          (face.boundingBox.right.toInt() - face.boundingBox.left.toInt()) *
+              (face.boundingBox.bottom.toInt() - face.boundingBox.top.toInt());
+      if (maxSize < size) {
+        maxSize = size;
+        index = i;
+      }
+      i++;
+    }
+    Face face = _scanResults[index];
+    // print(face.boundingBox);
+    const shift = (0xFF << 24);
+    final int width = image.width;
+    final int height = image.height;
+    final int uvRowStride = image.planes[1].bytesPerRow;
+    final int uvPixelStride = image.planes[1].bytesPerPixel;
+
+    // print("uvRowStride: " + uvRowStride.toString());
+    // print("uvPixelStride: " + uvPixelStride.toString());
+
+    // imgLib -> Image package from https://pub.dartlang.org/packages/image
+    var img = imglib.Image(width, height); // Create Image buffer
+
+    // Fill image buffer with plane[0] from YUV420_888
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        final int uvIndex =
+            uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+        final int index = y * width + x;
+
+        final yp = image.planes[0].bytes[index];
+        final up = image.planes[1].bytes[uvIndex];
+        final vp = image.planes[2].bytes[uvIndex];
+        // Calculate pixel color
+        int r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255);
+        int g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
+            .round()
+            .clamp(0, 255);
+        int b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255);
+        // color: 0x FF  FF  FF  FF
+        //           A   B   G   R
+        img.data[index] = shift | (b << 16) | (g << 8) | r;
+      }
+    }
+
+    imglib.PngEncoder pngEncoder = new imglib.PngEncoder(level: 0, filter: 0);
+    img = imglib.copyRotate(img, 90);
+    List<int> png = pngEncoder.encodeImage(img);
+
+    imglib.Image src = imglib.decodeImage(png);
+
+    var cropSize = max(
+        face.boundingBox.right.toInt() - face.boundingBox.left.toInt(),
+        face.boundingBox.bottom.toInt() - face.boundingBox.top.toInt());
+    // int offsetX = (src.width - min(src.width, src.height)) ~/ 2;
+    // int offsetY = (src.height - min(src.width, src.height)) ~/ 2;
+
+    imglib.Image destImage = imglib.copyCrop(
+      src,
+      face.boundingBox.left.toInt(),
+      face.boundingBox.top.toInt(),
+      cropSize,
+      cropSize,
+    );
+
+    // var jpg = imglib.encodeJpg(destImage);
+
+    String base64Image = base64Encode(imglib.encodeJpg(destImage));
+    // print(base64Image);
+    // var body = {"image": base64Image};
+    var header = {"Content-Type": "application/json"};
+    var body = {"image": base64Image};
+    http
+        .post(base_url + '/recognize/', headers: header, body: jsonEncode(body))
+        .then((res) => print(res))
+        .catchError((e) => print(e));
+
+    // await getExternalStorageDirectories().then((List<Directory> directory) {
+    //   print(directory[0].path);
+    //   File(directory[0].path + '/image.jpg').writeAsBytes(jpg);
+    // });
   }
 
   // @override
@@ -129,7 +233,15 @@ class _CameraViewState extends State<CameraView> {
     // if (snapshot.connectionState == ConnectionState.done) {
     // If the Future is complete, display the preview.
     return Scaffold(
-      body: _buildImage(),
+      body: InkWell(
+        onTap: () {
+          // _isDetecting = true;
+          cropFaceFromImage(_image);
+          // print("Hello");
+          //TODO: Do something to crop face from image
+        },
+        child: _buildImage(),
+      ),
       // body: Transform.scale(
       //   scale: _controller.value.aspectRatio / deviceRatio,
       //   child: Center(

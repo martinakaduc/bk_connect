@@ -10,38 +10,6 @@ import 'package:flutter/material.dart';
 
 enum Detector { barcode, face, label, cloudLabel, text }
 
-class BarcodeDetectorPainter extends CustomPainter {
-  BarcodeDetectorPainter(this.imageSize, this.barcodes);
-
-  final Size imageSize;
-  final List<Barcode> barcodes;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    for (Barcode barcode in barcodes) {
-      paint.color = Colors.green;
-      canvas.drawRect(
-        _scaleRect(
-          rect: barcode.boundingBox,
-          imageSize: imageSize,
-          widgetSize: size,
-        ),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(BarcodeDetectorPainter oldDelegate) {
-    return oldDelegate.imageSize != imageSize ||
-        oldDelegate.barcodes != barcodes;
-  }
-}
-
 class FaceDetectorPainter extends CustomPainter {
   FaceDetectorPainter(this.imageSize, this.faces);
 
@@ -53,7 +21,7 @@ class FaceDetectorPainter extends CustomPainter {
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
-      ..color = Colors.red;
+      ..color = Color.fromRGBO(242, 201, 76, 1);
 
     for (Face face in faces) {
       canvas.drawRect(
@@ -74,48 +42,6 @@ class FaceDetectorPainter extends CustomPainter {
 }
 
 // Paints rectangles around all the text in the image.
-class TextDetectorPainter extends CustomPainter {
-  TextDetectorPainter(this.imageSize, this.visionText);
-
-  final Size imageSize;
-  final VisionText visionText;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    Rect _getRect(TextContainer container) {
-      return _scaleRect(
-        rect: container.boundingBox,
-        imageSize: imageSize,
-        widgetSize: size,
-      );
-    }
-
-    for (TextBlock block in visionText.blocks) {
-      for (TextLine line in block.lines) {
-        for (TextElement element in line.elements) {
-          paint.color = Colors.green;
-          canvas.drawRect(_getRect(element), paint);
-        }
-
-        paint.color = Colors.yellow;
-        canvas.drawRect(_getRect(line), paint);
-      }
-
-      paint.color = Colors.red;
-      canvas.drawRect(_getRect(block), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(TextDetectorPainter oldDelegate) {
-    return oldDelegate.imageSize != imageSize ||
-        oldDelegate.visionText != visionText;
-  }
-}
 
 Rect _scaleRect({
   @required Rect rect,

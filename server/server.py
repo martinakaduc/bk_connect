@@ -1,9 +1,13 @@
 import datetime
 from flask import Flask, request, jsonify
+import os
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import (create_access_token, jwt_required, get_jwt_identity)
-
+import base64
 from InfoManager import InfoManager
+import numpy as np
+from PIL import Image
+import io
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'this is a secret key'
@@ -47,7 +51,28 @@ def login():
         msg = {"status": "failure", "message": "invalid username or password"}
         return jsonify(msg)
             
+@app.route("/recognize/", methods = ["POST"])
+def recognize():
+    data = request.get_json()
+    # print(data)
+    if data is None:
+        print("No valid request body, json missing!")
+        return jsonify({'error': 'No valid request body, json missing!'})
+    else:
+        image = data["image"]
+        print(convert_to_array(image))
+        # print(array)
+        return jsonify({'success': 'success'})
+   
 
+
+def convert_to_array(b64_string):
+    # with open("imageToSave.jpg", "wb") as fh:
+    #     fh.write(base64.decodebytes(b64_string.encode()))
+    tmp = base64.b64decode(b64_string)
+    image = Image.open(io.BytesIO(tmp))
+    image_np = np.array(image)
+    return image_np
 @app.route("/register/", methods=["POST"])
 def register():
     user = request.json
