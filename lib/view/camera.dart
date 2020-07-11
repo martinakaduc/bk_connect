@@ -175,14 +175,12 @@ class _CameraViewState extends State<CameraView> {
     // var jpg = imglib.encodeJpg(destImage);
 
     String base64Image = base64Encode(imglib.encodeJpg(destImage));
-    // print(base64Image);
-    // var body = {"image": base64Image};
     var header = {"Content-Type": "application/json"};
     var body = {"image": base64Image};
-    http
-        .post(base_url + '/recognize/', headers: header, body: jsonEncode(body))
-        .then((res) => print(res))
-        .catchError((e) => print(e));
+    var response = await http.post(base_url + '/recognize/',
+        headers: header, body: jsonEncode(body));
+    var responseJson = jsonDecode(response.body);
+    print(responseJson);
 
     // await getExternalStorageDirectories().then((List<Directory> directory) {
     //   print(directory[0].path);

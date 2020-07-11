@@ -23,6 +23,10 @@ class InfoManager:
     def getUser(self, username):
         return self._collection.find_one({"username": username})
 
+    def getUserviaID(self , studentID):
+        return self._collection.find_one({"id": studentID})
+
+
     def printDB(self):
         for document in self._collection.find():
             print(document)

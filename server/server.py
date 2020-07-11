@@ -8,10 +8,14 @@ from InfoManager import InfoManager
 import numpy as np
 from PIL import Image
 import io
-
+import classify
+import preprocess
+import cv2
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'this is a secret key'
 revoked_tokens = []
+
+classifier = classify.Classify()
 
 jwt = JWTManager(app)
 
@@ -53,16 +57,31 @@ def login():
             
 @app.route("/recognize/", methods = ["POST"])
 def recognize():
+    threshold = 0.2
     data = request.get_json()
+    
     # print(data)
     if data is None:
         print("No valid request body, json missing!")
         return jsonify({'error': 'No valid request body, json missing!'})
     else:
         image = data["image"]
-        print(convert_to_array(image))
+        image_array = convert_to_array(image)
+        studentID = classifier.predict(image_array, threshold)
+        user = infoManager.getUserviaID(studentID)
+        msg = {
+        "username": user["username"],
+        "id": user["id"],
+        "email": user["email"],
+        "phone": user["phone"],          
+        }
+        # print(info)
+        # print(studentID)
+        # print(convert_to_array(image))
         # print(array)
-        return jsonify({'success': 'success'})
+
+
+        return jsonify(msg)
    
 
 
@@ -70,9 +89,12 @@ def convert_to_array(b64_string):
     # with open("imageToSave.jpg", "wb") as fh:
     #     fh.write(base64.decodebytes(b64_string.encode()))
     tmp = base64.b64decode(b64_string)
+    # print(tmp)
     image = Image.open(io.BytesIO(tmp))
-    image_np = np.array(image)
-    return image_np
+    
+    # cv2.imshow('dcm', np.array(image))
+    # bb, pp_image, run_detect = preprocessor.align(image)
+    return np.array(image)
 @app.route("/register/", methods=["POST"])
 def register():
     user = request.json
