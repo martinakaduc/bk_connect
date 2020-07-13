@@ -1,11 +1,11 @@
 import 'dart:convert';
-
+import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/controller/config.dart';
 import 'package:bkconnect/view/utils.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
-// import '../image.dart';
 import 'detector_painters.dart';
 import 'utils.dart';
 import 'package:image/image.dart' as imglib;
@@ -13,6 +13,7 @@ import 'dart:math';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class CameraView extends StatefulWidget {
   CameraView() : super();
@@ -176,18 +177,323 @@ class _CameraViewState extends State<CameraView> {
 
     String base64Image = base64Encode(imglib.encodeJpg(destImage));
     var header = {"Content-Type": "application/json"};
-    var body = {"image": base64Image};
+
+    var storage = FlutterSecureStorage();
+    var token = await storage.read(key: "token");
+    var profile = await http.get(base_url + "/profile/",
+        headers: {"Authorization": "Bearer $token"});
+    var info = await jsonDecode(profile.body);
+    var body = {"image": base64Image, "id": info["id"]};
     var response = await http.post(base_url + '/recognize/',
         headers: header, body: jsonEncode(body));
     var responseJson = jsonDecode(response.body);
-    print(responseJson);
-
+    showPopUp(responseJson);
     // await getExternalStorageDirectories().then((List<Directory> directory) {
     //   print(directory[0].path);
     //   File(directory[0].path + '/image.jpg').writeAsBytes(jpg);
     // });
   }
 
+  void showPopUp(responseJson) {
+    // var height = MediaQuery.of(context).size.height;
+    // var width = MediaQuery.of(context).size.width;
+    showDialog(
+        context: context,
+        builder: (context) {
+          return ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 150.0, minWidth: 180.0),
+              child: AlertDialog(
+                scrollable: true,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30))),
+                backgroundColor: const Color(0xf2f6f7f5),
+                // insetPadding:
+                //     EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                title: Text("Success!",
+                    style: const TextStyle(
+                        color: const Color(0xff1588db),
+                        fontWeight: FontWeight.w700,
+                        fontFamily: "Roboto",
+                        fontStyle: FontStyle.normal,
+                        fontSize: 24.0),
+                    textAlign: TextAlign.center),
+                content: Column(
+                  // height: MediaQuery.of(context).size.height,
+                  // width: MediaQuery.of(context).size.width,
+                  // decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.all(Radius.circular(30)),
+                  //     color: const Color(0xf2f6f7f5)),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    GeneralImage(
+                      MediaQuery.of(context).size.width * 0.5,
+                      'assets/images/TC_Avatar.png',
+                      round: true,
+                    ),
+                    _infoLabel(responseJson),
+                  ],
+                ),
+                actions: [
+                  new FlatButton(
+                    child: const Text("OK"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+        });
+  }
+
+  Widget _infoLabel(responseJson) {
+    return Table(
+      columnWidths: {
+        0: FlexColumnWidth(2.0),
+        1: FlexColumnWidth(3.0),
+      },
+      children: <TableRow>[
+        TableRow(
+          children: <Widget>[
+            Padding(
+                child: Text("Full name:",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: Colors.black)),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
+            Padding(
+                child: Text(responseJson["username"],
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: Color(0xff828282))),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
+          ],
+        ),
+        TableRow(
+          children: <Widget>[
+            Padding(
+                child: Text("Student ID:",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: Colors.black)),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
+            Padding(
+                child: Text(responseJson["id"],
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: Color(0xff828282))),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
+          ],
+        ),
+        TableRow(
+          children: <Widget>[
+            Padding(
+                child: Text("Phone:",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: Colors.black)),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
+            Padding(
+                child: Text(responseJson["phone"],
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: Color(0xff828282))),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
+          ],
+        ),
+        TableRow(
+          children: <Widget>[
+            Padding(
+                child: Text("Email:",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: Colors.black)),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
+            Padding(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Text(responseJson["email"],
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          color: Color(0xff828282))),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // void showPopUp(responseJson) {
+  //   showCupertinoDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return CupertinoAlertDialog(
+  //           title: Text("Success!",
+  //               style: const TextStyle(
+  //                   color: const Color(0xff1588db),
+  //                   fontWeight: FontWeight.w700,
+  //                   fontFamily: "Roboto",
+  //                   fontStyle: FontStyle.normal,
+  //                   fontSize: 24.0)),
+  //           content: Container(
+  //               width: 350,
+  //               height: 500,
+  //               decoration: BoxDecoration(
+  //                   borderRadius: BorderRadius.all(Radius.circular(30)),
+  //                   color: const Color(0xf2f6f7f5)),
+
+  //                 child: Table(
+  //                   columnWidths: {
+  //                     0: FlexColumnWidth(2.0),
+  //                     1: FlexColumnWidth(3.0),
+  //                   },
+
+  //                 children: <TableRow>[
+  //                   TableRow(
+  //                     children: <Widget>[
+  //                       Padding(
+  //                           child: Text("Full name:",
+  //                               style: TextStyle(
+  //                                   fontWeight: FontWeight.w700,
+  //                                   fontSize: 20,
+  //                                   color: Colors.black)),
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 8, horizontal: 12)),
+  //                       Padding(
+  //                           child: Text(responseJson["username"],
+  //                               style: TextStyle(
+  //                                   fontWeight: FontWeight.w700,
+  //                                   fontSize: 20,
+  //                                   color: Color(0xff828282))),
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 8, horizontal: 12)),
+  //                     ],
+  //                   ),
+  //                   TableRow(
+  //                     children: <Widget>[
+  //                       Padding(
+  //                           child: Text("Student ID",
+  //                               style: TextStyle(
+  //                                   fontWeight: FontWeight.w700,
+  //                                   fontSize: 20,
+  //                                   color: Colors.black)),
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 8, horizontal: 12)),
+  //                       Padding(
+  //                           child: Text(responseJson["id"],
+  //                               style: TextStyle(
+  //                                   fontWeight: FontWeight.w700,
+  //                                   fontSize: 20,
+  //                                   color: Color(0xff828282))),
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 8, horizontal: 12)),
+  //                     ],
+  //                   ),
+  //                   TableRow(
+  //                     children: <Widget>[
+  //                       Padding(
+  //                           child: Text("Phone: ",
+  //                               style: TextStyle(
+  //                                   fontWeight: FontWeight.w700,
+  //                                   fontSize: 20,
+  //                                   color: Colors.black)),
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 8, horizontal: 12)),
+  //                       Padding(
+  //                           child: Text(responseJson["phone"],
+  //                               style: TextStyle(
+  //                                   fontWeight: FontWeight.w700,
+  //                                   fontSize: 20,
+  //                                   color: Color(0xff828282))),
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 8, horizontal: 12)),
+  //                     ],
+  //                   ),
+  //                   TableRow(
+  //                     children: <Widget>[
+  //                       Padding(
+  //                           child: Text("Email: ",
+  //                               style: TextStyle(
+  //                                   fontWeight: FontWeight.w700,
+  //                                   fontSize: 20,
+  //                                   color: Colors.black)),
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 8, horizontal: 12)),
+  //                       Padding(
+  //                           child: Text(responseJson["email"],
+  //                               style: TextStyle(
+  //                                   fontWeight: FontWeight.w700,
+  //                                   fontSize: 20,
+  //                                   color: Color(0xff828282))),
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 8, horizontal: 12)),
+  //                     ],
+  //                   ),
+  //                 ],
+  //               )),
+  //           actions: [
+  //             new FlatButton(
+  //               child: const Text("OK"),
+  //               onPressed: () {
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       });
+  // }
+
+  Future<dynamic> getProfile() async {
+    var storage = FlutterSecureStorage();
+    var token = await storage.read(key: "token");
+    return await http.get(base_url + "/profile/",
+        headers: {"Authorization": "Bearer $token"});
+  }
+
+  // Widget loginNavigation() {
+  //   return Container(
+  //     height: MediaQuery.of(context).size.height,
+  //     width: MediaQuery.of(context).size.width,
+  //     decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.all(Radius.circular(30)),
+  //         color: Colors.white),
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: <Widget>[
+  //         NormalText("Token has expired. Please login again"),
+  //         SizedBox(
+  //           height: 30,
+  //         ),
+  //         Button(
+  //           "Login",
+  //           124,
+  //           48,
+  //           fontSize: 20,
+  //           onTapFunction: () {
+  //             Navigator.push(context,
+  //                 MaterialPageRoute(builder: (context) => LoginScreen()));
+  //           },
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+  // dynamic getProfile() async {
+  //   var storage = FlutterSecureStorage();
+  //   var token = await storage.read(key: "token");
+  //   return await http.get(base_url + "/profile/",
+  //       headers: {"Authorization": "Bearer $token"});
+  // }
   // @override
   // void didChangeAppLifecycleState(AppLifecycleState state) {
   //   if (state == AppLifecycleState.resumed) {

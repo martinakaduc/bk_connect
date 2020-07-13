@@ -66,21 +66,18 @@ def recognize():
         return jsonify({'error': 'No valid request body, json missing!'})
     else:
         image = data["image"]
+        myID = data["id"]
         image_array = convert_to_array(image)
         studentID = classifier.predict(image_array, threshold)
-        user = infoManager.getUserviaID(studentID)
+        user = infoManager.getUserViaID(studentID)
+        if myID != studentID:
+            infoManager.addNewUserToFriendList(myID , studentID)
         msg = {
         "username": user["username"],
         "id": user["id"],
         "email": user["email"],
         "phone": user["phone"],          
         }
-        # print(info)
-        # print(studentID)
-        # print(convert_to_array(image))
-        # print(array)
-
-
         return jsonify(msg)
    
 
