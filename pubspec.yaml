@@ -31,6 +31,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   firebase_ml_vision:
   image:
+  image_picker:
   # flutter-permission-handler:
 
 dev_dependencies:

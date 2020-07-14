@@ -2,7 +2,13 @@ import 'package:bkconnect/controller/info.dart';
 import 'package:bkconnect/view/camera.dart';
 import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
+import 'package:bkconnect/view/gallery.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'dart:io';
+import 'dart:ui' as ui;
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 
 class HomePage extends StatefulWidget {
   HomePage();
@@ -12,49 +18,44 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
   final List<MemberInfo> infos = <MemberInfo>[];
 
   // This function is only used for test purpose
   @override
   void initState() {
-    for(var i=0; i<8; i++) {
+    for (var i = 0; i < 8; i++) {
       MemberInfo info;
-      if(i%4 == 0) {
+      if (i % 4 == 0) {
         info = MemberInfo(
-          name: "Trần Thùy Chi",
-          id: "181011x",
-          email: "daylaemail@hcmut.edu.vn",
-          phone: "0898 xxx yyy",
-          faculty: "Kỹ thuật Hóa học"
-        );
-      }
-      else if(i%4 == 1) {
+            name: "Trần Thùy Chi",
+            id: "181011x",
+            email: "daylaemail@hcmut.edu.vn",
+            phone: "0898 xxx yyy",
+            faculty: "Kỹ thuật Hóa học");
+      } else if (i % 4 == 1) {
         info = MemberInfo(
           name: "Nguyễn Thùy Chi",
           id: "181111x",
           email: "daylaemail@hcmut.edu.vn",
           phone: "0898 xxx yyy",
           faculty: "Cơ khí",
-        );        
-      }
-      else if(i%4 == 2) {
+        );
+      } else if (i % 4 == 2) {
         info = MemberInfo(
           name: "Nguyễn Hoàng Yến",
           id: "181211x",
           email: "daylaemail@hcmut.edu.vn",
           phone: "0898 xxx yyy",
           faculty: "Khoa học ứng dụng",
-        );        
-      }
-      else if(i%4 == 3) {
+        );
+      } else if (i % 4 == 3) {
         info = MemberInfo(
           name: "Dương Hoàng Yến",
           id: "181311x",
           email: "daylaemail@hcmut.edu.vn",
           phone: "0898 xxx yyy",
           faculty: "Quản lý công nghiệp",
-        );        
+        );
       }
       infos.add(info);
     }
@@ -67,9 +68,7 @@ class _HomePageState extends State<HomePage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            SizedBox(
-              height: 74
-            ),
+            SizedBox(height: 74),
             Expanded(
               child: ListView.separated(
                 shrinkWrap: true,
@@ -79,22 +78,20 @@ class _HomePageState extends State<HomePage> {
                   // these if-else statement is only used for test purpose
                   //***************************************************************
                   String image;
-                  if(index%4==0) {
+                  if (index % 4 == 0) {
                     image = "assets/images/image1.png";
-                  }
-                  else if(index%4==1) {
+                  } else if (index % 4 == 1) {
                     image = "assets/images/image2.png";
-                  }
-                  else if(index%4==2) {
+                  } else if (index % 4 == 2) {
                     image = "assets/images/image3.png";
-                  }
-                  else if(index%4==3) {
+                  } else if (index % 4 == 3) {
                     image = "assets/images/image4.png";
                   }
                   //***************************************************************
                   return InformationCard(image: image, info: infos[index]);
                 },
-                separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 10.0),
+                separatorBuilder: (BuildContext context, int index) =>
+                    const SizedBox(height: 10.0),
               ),
             ),
             SizedBox(
@@ -128,7 +125,10 @@ class _HomePageState extends State<HomePage> {
                 160,
                 48,
                 color: Color(0xffe0e0e0),
-                onTapFunction: () {},
+                onTapFunction: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => GalleryView()));
+                },
               ),
             ],
           ),
@@ -137,7 +137,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
 
 class InformationCard extends StatelessWidget {
   InformationCard({Key key, this.image, this.info}) : super(key: key);
@@ -155,73 +154,72 @@ class InformationCard extends StatelessWidget {
           ),
           child: Card(
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
-                children: <Widget>[
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
                 Container(
                   margin: EdgeInsets.all(5),
-                  child: GeneralImage(100, this.image, round: true,),
+                  child: GeneralImage(
+                    100,
+                    this.image,
+                    round: true,
+                  ),
                 ),
                 SizedBox(
                   width: 20,
-                ),             
-                Expanded( 
-                  child: Container( 
-                    padding: EdgeInsets.all(5), 
-                    child: Column(    
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[ 
+                      children: <Widget>[
                         Text(
-                          info.getName(), 
+                          info.getName(),
                           style: TextStyle(
-                            color:  Colors.black,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: "Roboto",
-                            fontStyle:  FontStyle.normal,
-                            fontSize: 20.0
-                          ),
+                              color: Colors.black,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 20.0),
                         ),
                         Text(
-                          info.getID(), 
+                          info.getID(),
                           style: const TextStyle(
-                            color:  Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Roboto",
-                            fontStyle:  FontStyle.normal,
-                            fontSize: 14.0
-                          ),     
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 14.0),
                         ),
                         Text(
-                          info.getPhone(), 
+                          info.getPhone(),
                           style: const TextStyle(
-                            color:  Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Roboto",
-                            fontStyle:  FontStyle.normal,
-                            fontSize: 14.0
-                          ),     
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 14.0),
                         ),
                         Text(
-                          info.getEmail(), 
+                          info.getEmail(),
                           style: const TextStyle(
-                            color:  Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Roboto",
-                            fontStyle:  FontStyle.normal,
-                            fontSize: 14.0
-                          ),     
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 14.0),
                         ),
                         Text(
-                          "Khoa " + info.getFaculty(), 
+                          "Khoa " + info.getFaculty(),
                           style: const TextStyle(
-                            color:  Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Roboto",
-                            fontStyle:  FontStyle.normal,
-                            fontSize: 14.0
-                          ),     
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 14.0),
                         ),
-                      ], 
+                      ],
                     ),
                   ),
                 ),
@@ -229,9 +227,12 @@ class InformationCard extends StatelessWidget {
             ),
           ),
         ),
-        Positioned(top: 5, right: 20, child: Icon(Icons.more_horiz),),
+        Positioned(
+          top: 5,
+          right: 20,
+          child: Icon(Icons.more_horiz),
+        ),
       ],
-    ); 
-
+    );
   }
 }
