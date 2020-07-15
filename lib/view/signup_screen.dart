@@ -236,7 +236,7 @@ class _SignupScreenState extends State<SignupScreen> {
               alignment: Alignment.topCenter,
               child: GeneralImage(
                 128,
-                'assets/images/BK image.png',
+                'assets/images/BK_image.png',
               ),
             ),
           ],

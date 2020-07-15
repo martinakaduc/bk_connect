@@ -6,9 +6,9 @@ class GeneralImage extends StatelessWidget {
     this.size = size;
     this.image = image;
     if (round == true) {
-      this.roundRadius = 36;
+      this.roundRadius = 360.0;
     } else {
-      this.roundRadius = 0;
+      this.roundRadius = 0.0;
     }
   }
 
@@ -26,8 +26,9 @@ class GeneralImage extends StatelessWidget {
           Radius.circular(this.roundRadius),
         ),
       ),
-      child: Image(
-        image: AssetImage(this.image),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(this.roundRadius),
+        child: Image.asset(this.image),     
       ),
     );
   }

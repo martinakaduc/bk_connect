@@ -1,0 +1,9 @@
+sklearn
+tensorflow==1.15.0
+numpy
+imageio
+six
+scipy==1.1.0
+opencv-python
+opencv-contrib-python
+openpyxl

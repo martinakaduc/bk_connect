@@ -24,9 +24,15 @@ dependencies:
   path:
   http:
   flutter_secure_storage:
+  google_maps_flutter:
+  url_launcher:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+  firebase_ml_vision:
+  image:
+  image_picker:
+  # flutter-permission-handler:
 
 dev_dependencies:
   flutter_test:

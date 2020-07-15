@@ -44,13 +44,13 @@ AppBar mainAppBar(int index) {
         padding: const EdgeInsets.only(left: 20.0),
         child: GeneralImage(
           75,
-          'assets/images/BK image.png',
+          'assets/images/BK_image.png',
         ),
       ),
       title: HomeTitle(),
     );
   } else if (index == 3) {
-    return AppBar();
+    return null;
   } else {
     return null;
   }
