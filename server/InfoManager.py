@@ -26,11 +26,11 @@ class InfoManager:
     def getUserViaID(self , studentID):
         return self._collection.find_one({"id": studentID})
 
-    def addNewUserToFriendList(self, myID , friendID):
-        if self._collection.find({"id" : myID , "FriendList" : {"$exists":False}} ):
-            self._collection.update({"id":myID} , {"$set"    :{"FriendList": [friendID]}})
-        else:
-            self._collection.update({"id":myID} , {"$addToSet":{"FriendList":friendID}})
+    def addNewUserToFriendList(self, username , friendID):
+        self._collection.find_and_modify(query={"username" : username , "FriendList" : {"$exists":False}} , update={"$set":{"FriendList": [friendID]}})
+        self._collection.find_and_modify(query={"username":username , "FriendList" : {"$exists":True}} , update={"$addToSet":{"FriendList":friendID}})
+
+
     def printDB(self):
         for document in self._collection.find():
             print(document)

@@ -1,139 +1,148 @@
+import 'dart:convert';
+import 'dart:ui';
+
 import 'package:bkconnect/controller/info.dart';
 import 'package:bkconnect/view/camera.dart';
 import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/view/gallery.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'dart:io';
-import 'dart:ui' as ui;
-import 'package:firebase_ml_vision/firebase_ml_vision.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:bkconnect/controller/config.dart';
+import 'package:bkconnect/view/components/text.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage();
-
+  HomePage() : super();
+  List<MemberInfo> infos = <MemberInfo>[];
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   final List<MemberInfo> infos = <MemberInfo>[];
-
   // This function is only used for test purpose
+  bool isLoading = false;
   @override
   void initState() {
-    for (var i = 0; i < 8; i++) {
-      MemberInfo info;
-      if (i % 4 == 0) {
-        info = MemberInfo(
-            name: "Trần Thùy Chi",
-            id: "181011x",
-            email: "daylaemail@hcmut.edu.vn",
-            phone: "0898 xxx yyy",
-            faculty: "Kỹ thuật Hóa học");
-      } else if (i % 4 == 1) {
-        info = MemberInfo(
-          name: "Nguyễn Thùy Chi",
-          id: "181111x",
-          email: "daylaemail@hcmut.edu.vn",
-          phone: "0898 xxx yyy",
-          faculty: "Cơ khí",
-        );
-      } else if (i % 4 == 2) {
-        info = MemberInfo(
-          name: "Nguyễn Hoàng Yến",
-          id: "181211x",
-          email: "daylaemail@hcmut.edu.vn",
-          phone: "0898 xxx yyy",
-          faculty: "Khoa học ứng dụng",
-        );
-      } else if (i % 4 == 3) {
-        info = MemberInfo(
-          name: "Dương Hoàng Yến",
-          id: "181311x",
-          email: "daylaemail@hcmut.edu.vn",
-          phone: "0898 xxx yyy",
-          faculty: "Quản lý công nghiệp",
-        );
-      }
-      infos.add(info);
-    }
+    super.initState();
+    // _getFriendList();
+  }
+
+  Future<dynamic> _getFriendList() async {
+    var storage = FlutterSecureStorage();
+    var token = await storage.read(key: "token");
+    return await http.get(base_url + "/getFriendList/",
+        headers: {"Authorization": "Bearer $token"});
+
+    // print(infos[0].getEmail());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+    return FutureBuilder(
+      future: _getFriendList(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: NormalText('Oh no! Error! ${snapshot.error}'));
+        }
+        if (!snapshot.hasData) {
+          return Center(child: NormalText('Nothing to show'));
+        }
+        var responseBody = json.decode(snapshot.data.body);
+        var friendList = responseBody["infoFriends"];
+        // print(friendList["infoFriends"]);
+
+        for (var friend in friendList) {
+          MemberInfo info;
+          info = MemberInfo(
+            email: friend["email"],
+            id: friend["id"],
+            name: friend["username"],
+            phone: friend["phone"],
+            faculty: "Khoa học và kỹ thuật máy tính",
+          );
+          infos.add(info);
+        }
+        widget.infos = infos;
+        // print(infos[0].getEmail());
+        // print(widget.infos[0].getName());
+        // if (widget.infos.length == 0)
+        //   return CircularProgressIndicator();
+        // else
+        return Stack(
           children: <Widget>[
-            SizedBox(height: 74),
-            Expanded(
-              child: ListView.separated(
-                shrinkWrap: true,
-                padding: const EdgeInsets.all(1),
-                itemCount: infos.length,
-                itemBuilder: (BuildContext context, int index) {
-                  // these if-else statement is only used for test purpose
-                  //***************************************************************
-                  String image;
-                  if (index % 4 == 0) {
-                    image = "assets/images/image1.png";
-                  } else if (index % 4 == 1) {
-                    image = "assets/images/image2.png";
-                  } else if (index % 4 == 2) {
-                    image = "assets/images/image3.png";
-                  } else if (index % 4 == 3) {
-                    image = "assets/images/image4.png";
-                  }
-                  //***************************************************************
-                  return InformationCard(image: image, info: infos[index]);
-                },
-                separatorBuilder: (BuildContext context, int index) =>
-                    const SizedBox(height: 10.0),
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(height: 74),
+                Expanded(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(1),
+                    itemCount: widget.infos.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      // these if-else statement is only used for test purpose
+                      //***************************************************************
+                      String image = "assets/images/image1.png";
+
+                      //***************************************************************
+                      return InformationCard(
+                          image: image, info: widget.infos[index]);
+                      // var info = infos[index].getEmail();
+                      // return Text('$info');
+                    },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(height: 10.0),
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+              ],
             ),
-            SizedBox(
-              height: 30,
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 74,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Button(
+                    "Camera",
+                    160,
+                    48,
+                    onTapFunction: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CameraView()),
+                      );
+                    },
+                  ),
+                  SizedBox(width: 30),
+                  Button(
+                    "Gallery",
+                    160,
+                    48,
+                    color: Color(0xffe0e0e0),
+                    onTapFunction: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => GalleryView()));
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
-        ),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: 74,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Colors.white),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Button(
-                "Camera",
-                160,
-                48,
-                onTapFunction: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CameraView()),
-                  );
-                },
-              ),
-              SizedBox(width: 30),
-              Button(
-                "Gallery",
-                160,
-                48,
-                color: Color(0xffe0e0e0),
-                onTapFunction: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => GalleryView()));
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -174,50 +183,65 @@ class InformationCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
-                          info.getName(),
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: "Roboto",
-                              fontStyle: FontStyle.normal,
-                              fontSize: 20.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            info.getName().toString(),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: "Roboto",
+                                fontStyle: FontStyle.normal,
+                                fontSize: 20.0),
+                          ),
                         ),
-                        Text(
-                          info.getID(),
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Roboto",
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            info.getID(),
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Roboto",
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14.0),
+                          ),
                         ),
-                        Text(
-                          info.getPhone(),
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Roboto",
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            info.getPhone().toString(),
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Roboto",
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14.0),
+                          ),
                         ),
-                        Text(
-                          info.getEmail(),
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Roboto",
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            info.getEmail().toString(),
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Roboto",
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14.0),
+                          ),
                         ),
-                        Text(
-                          "Khoa " + info.getFaculty(),
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Roboto",
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            "Khoa " + info.getFaculty().toString(),
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Roboto",
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14.0),
+                          ),
                         ),
                       ],
                     ),
@@ -230,9 +254,34 @@ class InformationCard extends StatelessWidget {
         Positioned(
           top: 5,
           right: 20,
-          child: Icon(Icons.more_horiz),
+          child: IconButton(
+            icon: Icon(Icons.more_horiz),
+            onPressed: () => _settingModalBottomSheet(context),
+          ),
         ),
       ],
     );
+  }
+
+  void _settingModalBottomSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: new Wrap(
+              children: <Widget>[
+                new ListTile(
+                    leading: new Icon(Icons.music_note),
+                    title: new Text('Music'),
+                    onTap: () => {}),
+                new ListTile(
+                  leading: new Icon(Icons.videocam),
+                  title: new Text('Video'),
+                  onTap: () => {},
+                ),
+              ],
+            ),
+          );
+        });
   }
 }

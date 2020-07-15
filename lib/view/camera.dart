@@ -10,8 +10,6 @@ import 'detector_painters.dart';
 import 'utils.dart';
 import 'package:image/image.dart' as imglib;
 import 'dart:math';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -176,16 +174,27 @@ class _CameraViewState extends State<CameraView> {
     // var jpg = imglib.encodeJpg(destImage);
 
     String base64Image = base64Encode(imglib.encodeJpg(destImage));
-    var header = {"Content-Type": "application/json"};
+    // var header = {"Content-Type": "application/json"};
 
+    // var storage = FlutterSecureStorage();
+    // var token = await storage.read(key: "token");
+    // var profile = await http.get(base_url + "/profile/",
+    //     headers: {"Authorization": "Bearer $token"});
+    // var info = await jsonDecode(profile.body);
+    // var body = {"image": base64Image, "id": info["id"]};
+    // var response = await http.post(base_url + '/recognize/',
+    //     headers: header, body: jsonEncode(body));
+    // var responseJson = jsonDecode(response.body);
+    // showPopUp(responseJson);
     var storage = FlutterSecureStorage();
     var token = await storage.read(key: "token");
-    var profile = await http.get(base_url + "/profile/",
-        headers: {"Authorization": "Bearer $token"});
-    var info = await jsonDecode(profile.body);
-    var body = {"image": base64Image, "id": info["id"]};
+    var body = {"image": base64Image};
     var response = await http.post(base_url + '/recognize/',
-        headers: header, body: jsonEncode(body));
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode(body));
     var responseJson = jsonDecode(response.body);
     showPopUp(responseJson);
     // await getExternalStorageDirectories().then((List<Directory> directory) {

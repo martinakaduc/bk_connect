@@ -56,6 +56,7 @@ def login():
         return jsonify(msg)
             
 @app.route("/recognize/", methods = ["POST"])
+@jwt_required
 def recognize():
     threshold = 0.2
     data = request.get_json()
@@ -66,12 +67,16 @@ def recognize():
         return jsonify({'error': 'No valid request body, json missing!'})
     else:
         image = data["image"]
-        myID = data["id"]
+        username  = get_jwt_identity()
         image_array = convert_to_array(image)
         studentID = classifier.predict(image_array, threshold)
+        if(studentID == 'Unknown face'):
+            print(studentID)
+            return
         user = infoManager.getUserViaID(studentID)
-        if myID != studentID:
-            infoManager.addNewUserToFriendList(myID , studentID)
+        if studentID != 'Unknown face':
+            print("a")
+            infoManager.addNewUserToFriendList(username , studentID)
         msg = {
         "username": user["username"],
         "id": user["id"],
@@ -83,8 +88,8 @@ def recognize():
 
 
 def convert_to_array(b64_string):
-    # with open("imageToSave.jpg", "wb") as fh:
-    #     fh.write(base64.decodebytes(b64_string.encode()))
+    with open("imageToSave.jpg", "wb") as fh:
+        fh.write(base64.decodebytes(b64_string.encode()))
     tmp = base64.b64decode(b64_string)
     # print(tmp)
     image = Image.open(io.BytesIO(tmp))
@@ -108,6 +113,37 @@ def register():
         msg = {"status": "failure", "message": "username already taken"}
         return jsonify(msg)
 
+@app.route("/getFriendList/", methods=["GET"])
+@jwt_required
+def getFriendList():
+    username = get_jwt_identity()
+    infoFriends = []
+    user = infoManager.getUser(username = username)
+    myInfo = {
+        "username": user["username"],
+        "id": user["id"],
+        "email": user["email"],
+        "phone": user["phone"],
+    }
+    infoFriends.append(myInfo)
+    if "FriendList" in user:
+        friendList = user["FriendList"]
+        for friendID in friendList :
+            tempInfo = infoManager.getUserViaID(friendID)
+            info = {
+                "username": tempInfo["username"],
+                "id": tempInfo["id"],
+                "email": tempInfo["email"],
+                "phone": tempInfo["phone"],      
+            }
+            infoFriends.append(info)
+    msg = {
+        "infoFriends": infoFriends,
+    }
+    
+    return jsonify(msg)
+
+
 @app.route("/profile/", methods=["GET"])
 @jwt_required
 def send_profile():
@@ -121,7 +157,10 @@ def send_profile():
     }
     return jsonify(msg)
 
-
+# @app.route("/update_position", methods=["POST"])
+# @jwt_required
+# def update_position():
+#     username = get_jwt_identity()
 
 
 if __name__ == "__main__":

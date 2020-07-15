@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/controller/config.dart';
+import 'package:bkconnect/view/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:image_picker/image_picker.dart';
@@ -232,16 +233,17 @@ class _GalleryViewState extends State<GalleryView> {
     );
 
     String base64Image = base64Encode(imglib.encodeJpg(destImage));
-    var header = {"Content-Type": "application/json"};
+    // var header = {"Content-Type": "application/json"};
 
     var storage = FlutterSecureStorage();
     var token = await storage.read(key: "token");
-    var profile = await http.get(base_url + "/profile/",
-        headers: {"Authorization": "Bearer $token"});
-    var info = await jsonDecode(profile.body);
-    var body = {"image": base64Image, "id": info["id"]};
+    var body = {"image": base64Image};
     var response = await http.post(base_url + '/recognize/',
-        headers: header, body: jsonEncode(body));
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode(body));
     var responseJson = jsonDecode(response.body);
     showPopUp(responseJson);
     // await getExternalStorageDirectories().then((List<Directory> directory) {
@@ -283,6 +285,8 @@ class _GalleryViewState extends State<GalleryView> {
             child: FloatingActionButton(
               onPressed: () async {
                 Navigator.pop(context);
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => HomePage()));
               },
               tooltip: 'Exit',
               child: Icon(
