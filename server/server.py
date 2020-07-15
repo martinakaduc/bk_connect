@@ -157,7 +157,10 @@ def send_profile():
     }
     return jsonify(msg)
 
-
+# @app.route("/update_position", methods=["POST"])
+# @jwt_required
+# def update_position():
+#     username = get_jwt_identity()
 
 
 if __name__ == "__main__":

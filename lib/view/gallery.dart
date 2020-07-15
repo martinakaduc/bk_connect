@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/controller/config.dart';
+import 'package:bkconnect/view/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:image_picker/image_picker.dart';
