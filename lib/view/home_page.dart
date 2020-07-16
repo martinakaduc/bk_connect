@@ -11,6 +11,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:bkconnect/controller/config.dart';
 import 'package:bkconnect/view/components/text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   HomePage() : super();
@@ -256,14 +257,14 @@ class InformationCard extends StatelessWidget {
           right: 20,
           child: IconButton(
             icon: Icon(Icons.more_horiz),
-            onPressed: () => _settingModalBottomSheet(context),
+            onPressed: () => _settingModalBottomSheet(context, info.getPhone()),
           ),
         ),
       ],
     );
   }
 
-  void _settingModalBottomSheet(context) {
+  void _settingModalBottomSheet(context, phoneNumber) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
@@ -284,6 +285,9 @@ class InformationCard extends StatelessWidget {
                   image: 'assets/images/call_icon.png',
                   title: 'Call',
                   text: 'Try to make connection by calling',
+                  onTap: () {
+                    launch("tel://" + phoneNumber);
+                  },
                 ),
                 InfoMenuCard(
                   image: 'assets/images/delete_icon.png',
@@ -313,15 +317,17 @@ class InformationCard extends StatelessWidget {
 }
 
 class InfoMenuCard extends StatelessWidget {
-  InfoMenuCard({Key key, this.image, this.title, this.text}) : super(key: key);
+  InfoMenuCard({Key key, this.image, this.title, this.text, this.onTap})
+      : super(key: key);
   final String title;
   final String text;
   final String image;
+  final GestureTapCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         height: 80,
         decoration: BoxDecoration(
