@@ -268,20 +268,116 @@ class InformationCard extends StatelessWidget {
         context: context,
         builder: (BuildContext bc) {
           return Container(
-            child: new Wrap(
+            child: Column(
               children: <Widget>[
-                new ListTile(
-                    leading: new Icon(Icons.music_note),
-                    title: new Text('Music'),
-                    onTap: () => {}),
-                new ListTile(
-                  leading: new Icon(Icons.videocam),
-                  title: new Text('Video'),
-                  onTap: () => {},
+                InfoMenuCard(
+                  image: 'assets/images/save_icon.png',
+                  title: 'Save to contact',
+                  text: 'Save this people to phone contact',
                 ),
+                InfoMenuCard(
+                  image: 'assets/images/share_icon.png',
+                  title: 'Share contact',
+                  text: 'Share this contact to your friend',
+                ),
+                InfoMenuCard(
+                  image: 'assets/images/call_icon.png',
+                  title: 'Call',
+                  text: 'Try to make connection by calling',
+                ),
+                InfoMenuCard(
+                  image: 'assets/images/delete_icon.png',
+                  title: 'Delete',
+                  text: 'Remove this contact in recognized',
+                )
               ],
             ),
           );
+          // return Container(
+          //   child: new Wrap(
+          //     children: <Widget>[
+          //       new ListTile(
+          //           leading: new Icon(Icons.music_note),
+          //           title: new Text('Music'),
+          //           onTap: () => {}),
+          //       new ListTile(
+          //         leading: new Icon(Icons.videocam),
+          //         title: new Text('Video'),
+          //         onTap: () => {},
+          //       ),
+          //     ],
+          //   ),
+          // );
         });
+  }
+}
+
+class InfoMenuCard extends StatelessWidget {
+  InfoMenuCard({Key key, this.image, this.title, this.text}) : super(key: key);
+  final String title;
+  final String text;
+  final String image;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xffe0e0e0), width: 1),
+      ),
+      child: Card(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.all(5),
+              child: GeneralImage(
+                50,
+                this.image,
+                round: true,
+              ),
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        this.title,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: "Roboto",
+                            fontStyle: FontStyle.normal,
+                            fontSize: 24.0),
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        this.text,
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Roboto",
+                            fontStyle: FontStyle.normal,
+                            fontSize: 18.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
