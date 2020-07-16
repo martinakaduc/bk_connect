@@ -257,18 +257,19 @@ class InformationCard extends StatelessWidget {
           right: 20,
           child: IconButton(
             icon: Icon(Icons.more_horiz),
-            onPressed: () => _settingModalBottomSheet(context, info.getPhone()),
+            onPressed: () => _settingModalBottomSheet(context, info),
           ),
         ),
       ],
     );
   }
 
-  void _settingModalBottomSheet(context, phoneNumber) {
+  void _settingModalBottomSheet(context, MemberInfo info) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
           return Container(
+            height: 330,
             child: Column(
               children: <Widget>[
                 InfoMenuCard(
@@ -286,7 +287,7 @@ class InformationCard extends StatelessWidget {
                   title: 'Call',
                   text: 'Try to make connection by calling',
                   onTap: () {
-                    launch("tel://" + phoneNumber);
+                    launch("tel://" + info.getPhone());
                   },
                 ),
                 InfoMenuCard(
