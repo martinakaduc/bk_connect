@@ -144,6 +144,17 @@ def getFriendList():
     return jsonify(msg)
 
 
+@app.route("/delete_friend/", methods=["POST"])
+@jwt_required
+def delete_friend():
+    username = get_jwt_identity()
+    friendID = request.json["id"]
+    is_successful = infoManager.removeUserInFriendList(username=username, friendID=friendID)
+    msg = {"status": "failure"}
+    if is_successful:
+        msg = {"status": "success"}
+    return jsonify(msg)
+
 @app.route("/profile/", methods=["GET"])
 @jwt_required
 def send_profile():

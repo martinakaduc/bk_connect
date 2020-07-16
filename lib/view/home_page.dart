@@ -287,13 +287,16 @@ class InformationCard extends StatelessWidget {
                   title: 'Call',
                   text: 'Try to make connection by calling',
                   onTap: () {
-                    launch("tel://" + info.getPhone());
+                    makePhoneCall(info.getPhone());
                   },
                 ),
                 InfoMenuCard(
                   image: 'assets/images/delete_icon.png',
                   title: 'Delete',
                   text: 'Remove this contact in recognized',
+                  onTap: () {
+                    removeFriend(info.getID());
+                  },
                 )
               ],
             ),
@@ -314,6 +317,27 @@ class InformationCard extends StatelessWidget {
           //   ),
           // );
         });
+  }
+
+  void makePhoneCall(String phoneNumber) {
+    launch("tel://" + phoneNumber);
+  }
+
+  void removeFriend(String id) async {
+    var storage = FlutterSecureStorage();
+    var token = await storage.read(key: "token");
+    try {
+      var body = {"id": id};
+      var response = await http.post(base_url + "/delete_friend/",
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json"
+          },
+          body: json.encode(body));
+      print(response.body);
+    } catch (e) {
+      print("Delete Error");
+    }
   }
 }
 
