@@ -320,62 +320,65 @@ class InfoMenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xffe0e0e0), width: 1),
-      ),
-      child: Card(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.all(5),
-              child: GeneralImage(
-                50,
-                this.image,
-                round: true,
-              ),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.all(5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Text(
-                        this.title,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Roboto",
-                            fontStyle: FontStyle.normal,
-                            fontSize: 24.0),
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Text(
-                        this.text,
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Roboto",
-                            fontStyle: FontStyle.normal,
-                            fontSize: 18.0),
-                      ),
-                    ),
-                  ],
+    return InkWell(
+      onTap: () {},
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xffe0e0e0), width: 1),
+        ),
+        child: Card(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.all(5),
+                child: GeneralImage(
+                  50,
+                  this.image,
+                  round: true,
                 ),
               ),
-            ),
-          ],
+              SizedBox(
+                width: 20,
+              ),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          this.title,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 24.0),
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          this.text,
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 18.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
