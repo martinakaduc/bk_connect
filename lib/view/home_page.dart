@@ -294,28 +294,76 @@ class InformationCard extends StatelessWidget {
                   image: 'assets/images/delete_icon.png',
                   title: 'Delete',
                   text: 'Remove this contact in recognized',
-                  onTap: () {
-                    removeFriend(info.getID());
+                  onTap: () async {
+                    var success = await removeFriend(info.getID());
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0))),
+                          content: Builder(builder: (BuildContext context) {
+                            return Container(
+                              height: MediaQuery.of(context).size.height * 0.25,
+                              width: MediaQuery.of(context).size.width * 0.9,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Container(
+                                    child: Text(
+                                      success ? "Success!" : "Failure",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color:
+                                            success ? Colors.blue : Colors.red,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Text(
+                                      success
+                                          ? "Đã xóa thành công"
+                                          : "Chưa xóa được",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                  FlatButton(
+                                    child: Text(
+                                      "OK",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color:
+                                            success ? Colors.blue : Colors.red,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                    );
                   },
                 )
               ],
             ),
           );
-          // return Container(
-          //   child: new Wrap(
-          //     children: <Widget>[
-          //       new ListTile(
-          //           leading: new Icon(Icons.music_note),
-          //           title: new Text('Music'),
-          //           onTap: () => {}),
-          //       new ListTile(
-          //         leading: new Icon(Icons.videocam),
-          //         title: new Text('Video'),
-          //         onTap: () => {},
-          //       ),
-          //     ],
-          //   ),
-          // );
         });
   }
 
@@ -323,7 +371,7 @@ class InformationCard extends StatelessWidget {
     launch("tel://" + phoneNumber);
   }
 
-  void removeFriend(String id) async {
+  Future<bool> removeFriend(String id) async {
     var storage = FlutterSecureStorage();
     var token = await storage.read(key: "token");
     try {
@@ -335,6 +383,7 @@ class InformationCard extends StatelessWidget {
           },
           body: json.encode(body));
       print(response.body);
+      return json.decode(response.body)["status"] == "success" ? true : false;
     } catch (e) {
       print("Delete Error");
     }
