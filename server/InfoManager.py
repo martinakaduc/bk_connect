@@ -32,7 +32,11 @@ class InfoManager:
 
     def removeUserInFriendList(self, username, friendID):
         result = self._collection.update_one({"username": username}, update={"$pull": {"FriendList": friendID}})
-        return result.matched_count > 0
+        return result.modified_count > 0
+
+    def updatePosition(self, username, position):
+        self._collection.find_and_modify(query={"username" : username}, update={"$set":{"position": position}})
+       
 
     def printDB(self):
         for document in self._collection.find():

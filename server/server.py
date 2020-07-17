@@ -168,10 +168,36 @@ def send_profile():
     }
     return jsonify(msg)
 
-# @app.route("/update_position", methods=["POST"])
-# @jwt_required
-# def update_position():
-#     username = get_jwt_identity()
+@app.route("/update_position/", methods=["POST"])
+@jwt_required
+def update_position():
+    username = get_jwt_identity()
+    # Update position
+    position = {
+        "latitude": request.json["latitude"],
+        "longitude": request.json["longitude"]
+    }
+    print(position)
+    infoManager.updatePosition(username=username, position=position)
+    # Get friends's position
+    user = infoManager.getUser(username=username)
+    friends_position = []
+    if "FriendList" in user:
+        friendList = user["FriendList"]
+        for friendID in friendList :
+            friend = infoManager.getUserViaID(friendID)
+            if "position" in friend:
+                info = {
+                    "username": friend["username"],
+                    "latitude": friend["position"]["latitude"],
+                    "longitude": friend["position"]["longitude"]
+                }
+                friends_position.append(info)
+    msg = {
+        "friends_position": friends_position,
+    }
+
+    return jsonify(msg)
 
 
 if __name__ == "__main__":
