@@ -314,7 +314,7 @@ class InformationCard extends StatelessWidget {
                                 children: <Widget>[
                                   Container(
                                     child: Text(
-                                      success ? "Success!" : "Failure",
+                                      success ? "Success!" : "Failure!",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color:
