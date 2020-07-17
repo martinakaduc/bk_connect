@@ -304,15 +304,19 @@ class InformationCard extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(30.0))),
                           content: Builder(builder: (BuildContext context) {
+                            var height =
+                                MediaQuery.of(context).size.height * 0.25;
+                            var width = MediaQuery.of(context).size.width * 0.9;
                             return Container(
-                              height: MediaQuery.of(context).size.height * 0.25,
-                              width: MediaQuery.of(context).size.width * 0.9,
+                              height: height,
+                              width: width,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Container(
+                                    height: height * 0.15,
                                     child: Text(
                                       success ? "Success!" : "Failure!",
                                       textAlign: TextAlign.center,
@@ -324,6 +328,10 @@ class InformationCard extends StatelessWidget {
                                       ),
                                     ),
                                   ),
+                                  Divider(
+                                    color: Colors.black,
+                                  ),
+                                  Spacer(),
                                   Container(
                                     child: Text(
                                       success
@@ -337,20 +345,28 @@ class InformationCard extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  FlatButton(
-                                    child: Text(
-                                      "OK",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color:
-                                            success ? Colors.blue : Colors.red,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w400,
+                                  Spacer(),
+                                  Divider(
+                                    color: Colors.black,
+                                  ),
+                                  Container(
+                                    height: height * 0.15,
+                                    child: FlatButton(
+                                      child: Text(
+                                        "OK",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: success
+                                              ? Colors.blue
+                                              : Colors.red,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w400,
+                                        ),
                                       ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
                                     ),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
                                   ),
                                 ],
                               ),
