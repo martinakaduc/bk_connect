@@ -276,6 +276,9 @@ class InformationCard extends StatelessWidget {
                   image: 'assets/images/save_icon.png',
                   title: 'Save to contact',
                   text: 'Save this people to phone contact',
+                  onTap: () {
+                    savePhone(info.getPhone());
+                  },
                 ),
                 InfoMenuCard(
                   image: 'assets/images/share_icon.png',
@@ -384,6 +387,10 @@ class InformationCard extends StatelessWidget {
   }
 
   void makePhoneCall(String phoneNumber) {
+    launch("tel://" + phoneNumber);
+  }
+
+  void savePhone(String phoneNumber) {
     launch("tel://" + phoneNumber);
   }
 
