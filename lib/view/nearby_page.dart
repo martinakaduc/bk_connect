@@ -86,13 +86,13 @@ class _NearbyPageState extends State<NearbyPage> {
             "Content-Type": "application/json"
           },
           body: json.encode(body));
-      print(response.body);
-      Iterable lst = json.decode(response.body)["friends_position"];
-      print(lst);
+
+      var lst = json.decode(response.body)["friends_position"] as List;
       List<Friend> friends = lst.map((i) => Friend.fromJson(i)).toList();
       return friends;
     } catch (e) {
       print("Seek Error");
+      print(e.toString());
     }
   }
 
@@ -107,12 +107,12 @@ class _NearbyPageState extends State<NearbyPage> {
           // update current pin
           // This marker id can be anything that uniquely identifies each marker.
           markerId: MarkerId(friend.username),
-          position: LatLng(
-              double.parse(friend.latitude), double.parse(friend.longitude)),
+          position: LatLng(friend.latitude, friend.longitude),
           infoWindow: InfoWindow(
             title: friend.username,
           ),
-          icon: BitmapDescriptor.defaultMarker,
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
         ));
       }
     });
@@ -132,7 +132,7 @@ class _NearbyPageState extends State<NearbyPage> {
           title: 'Trường Đại học Bách khoa - Đại học Quốc gia TP.HCM',
           snippet: '268 Lý Thường Kiệt, Phường 14, Quận 10, Hồ Chí Minh',
         ),
-        icon: BitmapDescriptor.defaultMarker,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ));
     });
   }
@@ -164,8 +164,8 @@ class _NearbyPageState extends State<NearbyPage> {
 
 class Friend {
   String username;
-  String latitude;
-  String longitude;
+  double latitude;
+  double longitude;
 
   Friend({this.username, this.latitude, this.longitude});
 
