@@ -21,7 +21,8 @@ class _NearbyPageState extends State<NearbyPage> {
   Completer<GoogleMapController> _controller = Completer();
   Position currentPosition;
 
-  static const LatLng _center = const LatLng(10.772614, 106.657698);
+  static const LatLng _bk1 = const LatLng(10.772614, 106.657698);
+  static const LatLng _bk2 = const LatLng(10.880527, 106.805483);
 
   final Set<Marker> _markers = Set<Marker>();
 
@@ -100,8 +101,9 @@ class _NearbyPageState extends State<NearbyPage> {
     setState(() {
       _markers.removeWhere((marker) =>
           marker.markerId.value != "current pin" &&
+          marker.markerId.value != _bk1.toString() &&
           marker.markerId.value !=
-              _center.toString()); // remove all old friends' position
+              _bk2.toString()); // remove all old friends' position
       for (var friend in friends) {
         _markers.add(Marker(
           // update current pin
@@ -126,11 +128,21 @@ class _NearbyPageState extends State<NearbyPage> {
     setState(() {
       _markers.add(Marker(
         // This marker id can be anything that uniquely identifies each marker.
-        markerId: MarkerId(_center.toString()),
-        position: _center,
+        markerId: MarkerId(_bk1.toString()),
+        position: _bk1,
         infoWindow: InfoWindow(
           title: 'Trường Đại học Bách khoa - Đại học Quốc gia TP.HCM',
           snippet: '268 Lý Thường Kiệt, Phường 14, Quận 10, Hồ Chí Minh',
+        ),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ));
+      _markers.add(Marker(
+        // This marker id can be anything that uniquely identifies each marker.
+        markerId: MarkerId(_bk2.toString()),
+        position: _bk2,
+        infoWindow: InfoWindow(
+          title: 'Trường Đại học Bách khoa - Đại học Quốc gia TP.HCM',
+          snippet: 'Đông Hoà, Tx. Dĩ An, Bình Dương, Việt Nam',
         ),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ));
@@ -140,7 +152,7 @@ class _NearbyPageState extends State<NearbyPage> {
   @override
   Widget build(BuildContext context) {
     CameraPosition initialCameraPosition =
-        CameraPosition(target: _center, zoom: CAMERA_ZOOM);
+        CameraPosition(target: _bk1, zoom: CAMERA_ZOOM);
     if (currentPosition != null) {
       initialCameraPosition = CameraPosition(
         target: LatLng(currentPosition.latitude, currentPosition.longitude),
