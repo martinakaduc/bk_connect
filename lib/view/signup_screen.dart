@@ -222,11 +222,17 @@ class _SignupScreenState extends State<SignupScreen> {
                         size: 36.0,
                       ),
                       validator: (String val) {
-                        return val.isEmpty ? "Password does not match!" : null;
+                        if (val.isNotEmpty) {
+                          return val == _info.getPassword()
+                              ? null
+                              : "Password does not match!";
+                        } else {
+                          return "Please confirm your password in order to register!";
+                        }
                       },
-                      onSave: (String val) {
-                        _info.setPassword(val);
-                      },
+                      // onSave: (String val) {
+                      //   _info.setPassword(val);
+                      // },
                     ),
                     SizedBox(height: 45),
                     FormField(
@@ -250,8 +256,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               48,
                               fontSize: 20,
                               onTapFunction: () async {
+                                _key.currentState.save();
                                 if (_key.currentState.validate()) {
-                                  _key.currentState.save();
+                                  //_key.currentState.save();
                                   try {
                                     var response = await _auth.signUp(_info);
                                     submitCallback(response);
