@@ -1,4 +1,5 @@
 import pymongo, urllib.parse
+from werkzeug.security import check_password_hash
 
 
 class InfoManager:
@@ -13,8 +14,9 @@ class InfoManager:
         return True
 
     def authorizeSignIn(self, username, password):
-        if self._collection.count({"username": username, "password": password}) == 1:
-            return True
+        user = self.getUser(username)
+        if user != None:
+            return check_password_hash(user["password"], password)
         return False
 
     def addUser(self, info):

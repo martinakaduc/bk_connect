@@ -11,6 +11,9 @@ import io
 import classify
 import preprocess
 import cv2
+from werkzeug.security import generate_password_hash
+
+
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'this is a secret key'
 revoked_tokens = []
@@ -97,6 +100,8 @@ def convert_to_array(b64_string):
     # cv2.imshow('dcm', np.array(image))
     # bb, pp_image, run_detect = preprocessor.align(image)
     return np.array(image)
+
+
 @app.route("/register/", methods=["POST"])
 def register():
     user = request.json
@@ -106,6 +111,7 @@ def register():
         return jsonify(msg)
 
     if infoManager.authorizeSignUp(username=user["username"]):
+        user["password"] = generate_password_hash(user["password"], "sha256")   # hash password
         infoManager.addUser(user)
         msg = {"status": "success", "message": "registered successfully"}
         return jsonify(msg)
