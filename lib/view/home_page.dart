@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:bkconnect/controller/config.dart';
 import 'package:bkconnect/view/components/text.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:bkconnect/view/login_screen.dart';
 
 class HomePage extends StatefulWidget {
   HomePage() : super();
@@ -39,6 +40,35 @@ class _HomePageState extends State<HomePage> {
     // print(infos[0].getEmail());
   }
 
+  Widget loginNavigation() {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+          color: Colors.white),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          NormalText("Token has expired. Please login again"),
+          SizedBox(
+            height: 30,
+          ),
+          Button(
+            "Login",
+            124,
+            48,
+            fontSize: 20,
+            onTapFunction: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -52,6 +82,14 @@ class _HomePageState extends State<HomePage> {
         }
         if (!snapshot.hasData) {
           return Center(child: NormalText('Nothing to show'));
+        }
+
+        final int statusCode = snapshot.data.statusCode;
+        if (statusCode > 299) {
+          if (statusCode == 401) {
+            return loginNavigation();
+          }
+          return Center(child: NormalText('Error: $statusCode'));
         }
         var responseBody = json.decode(snapshot.data.body);
         var friendList = responseBody["infoFriends"];
