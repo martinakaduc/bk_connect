@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:bkconnect/controller/config.dart';
 import 'package:bkconnect/controller/info.dart';
 import 'package:bkconnect/view/camera.dart';
 import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
+import 'package:bkconnect/view/components/text.dart';
 import 'package:bkconnect/view/gallery.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:bkconnect/controller/config.dart';
-import 'package:bkconnect/view/components/text.dart';
 
 class HomePage extends StatefulWidget {
   HomePage() : super();

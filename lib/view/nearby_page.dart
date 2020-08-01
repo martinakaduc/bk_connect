@@ -1,8 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'dart:async';
-import 'package:url_launcher/url_launcher.dart';
 
 const double CAMERA_ZOOM = 25.0;
 const int POSITON_UPDATE_TIME_INTERVAL = 1000;
@@ -41,8 +41,8 @@ class _NearbyPageState extends State<NearbyPage> {
 
     Geolocator()
         .getPositionStream(LocationOptions(
-            accuracy: LocationAccuracy.best,
-            timeInterval: POSITON_UPDATE_TIME_INTERVAL))
+        accuracy: LocationAccuracy.best,
+        timeInterval: POSITON_UPDATE_TIME_INTERVAL))
         .listen((position) {
       currentPosition = position;
       updateCurrentPosition();
@@ -63,7 +63,7 @@ class _NearbyPageState extends State<NearbyPage> {
     controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     setState(() {
       _markers.removeWhere((marker) =>
-          marker.markerId.value == "current pin"); // remove previous pin
+      marker.markerId.value == "current pin"); // remove previous pin
       _markers.add(Marker(
         // update current pin
         // This marker id can be anything that uniquely identifies each marker.
@@ -99,7 +99,7 @@ class _NearbyPageState extends State<NearbyPage> {
   @override
   Widget build(BuildContext context) {
     CameraPosition initialCameraPosition =
-        CameraPosition(target: _center, zoom: CAMERA_ZOOM);
+    CameraPosition(target: _center, zoom: CAMERA_ZOOM);
     if (currentPosition != null) {
       initialCameraPosition = CameraPosition(
         target: LatLng(currentPosition.latitude, currentPosition.longitude),

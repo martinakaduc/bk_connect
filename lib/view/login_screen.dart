@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:bkconnect/controller/authencation.dart';
 import 'package:bkconnect/controller/info.dart';
 import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
@@ -8,10 +11,8 @@ import 'package:bkconnect/view/main_screen.dart';
 import 'package:bkconnect/view/signup_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:bkconnect/controller/authencation.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 
 
 class LoginScreen extends StatefulWidget {
@@ -34,16 +35,16 @@ class _LoginScreenState extends State<LoginScreen> {
     var msg = json.decode(response.body);
     if(msg["status"] == "success") {
       var storage = FlutterSecureStorage();
-      storage.write(key: "token", value: msg["access_token"]);      
+      storage.write(key: "token", value: msg["access_token"]);
       Navigator.push(
-        context, 
-        MaterialPageRoute(builder: (context) => MainScreen())
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen())
       );
     }
     else {
       showAlertDialog(msg);
     }
-  } 
+  }
 
   void showAlertDialog(Map<String, dynamic> msg) {
     showDialog(
@@ -76,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ],
       ),
-    );                  
+    );
   }
 
   @override
@@ -136,39 +137,39 @@ class _LoginScreenState extends State<LoginScreen> {
                       builder: (FormFieldState<String> state) {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Button(
-                            "Cancel",
-                            124,
-                            48,
-                            fontSize: 20,
-                            onTapFunction: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          SizedBox(width: 50),
-                          Button(
-                            "Login",
-                            124,
-                            48,
-                            fontSize: 20,
-                            onTapFunction: () async {
-                              if (_key.currentState.validate()) {
-                                _key.currentState.save();
-                                try {
-                                  var response = await _auth.signIn(_info);
-                                  submitCallback(response);
-                                } catch(e) {
-                                  print(e);
-                                  var msg = {"status": "failure", "message": "lost connection"};
-                                  showAlertDialog(msg);
+                          children: <Widget>[
+                            Button(
+                              "Cancel",
+                              124,
+                              48,
+                              fontSize: 20,
+                              onTapFunction: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            SizedBox(width: 50),
+                            Button(
+                              "Login",
+                              124,
+                              48,
+                              fontSize: 20,
+                              onTapFunction: () async {
+                                if (_key.currentState.validate()) {
+                                  _key.currentState.save();
+                                  try {
+                                    var response = await _auth.signIn(_info);
+                                    submitCallback(response);
+                                  } catch(e) {
+                                    print(e);
+                                    var msg = {"status": "failure", "message": "lost connection"};
+                                    showAlertDialog(msg);
+                                  }
                                 }
-                              }
-                            },
-                          ),
-                        ],
-                      );
-                    },),
+                              },
+                            ),
+                          ],
+                        );
+                      },),
                     SizedBox(height: 64),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

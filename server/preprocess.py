@@ -1,6 +1,7 @@
-from scipy import misc
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+from scipy import misc
+
 import detect_face
 
 

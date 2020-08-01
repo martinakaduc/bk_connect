@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
-
+import 'package:flutter/material.dart';
 
 class NewsPage extends StatefulWidget {
   NewsPage();

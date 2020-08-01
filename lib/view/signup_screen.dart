@@ -1,12 +1,13 @@
+import 'dart:convert';
+
+import 'package:bkconnect/controller/authencation.dart';
 import 'package:bkconnect/controller/info.dart';
 import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/view/components/input.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:bkconnect/controller/authencation.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class SignupScreen extends StatefulWidget {
   SignupScreen() : super();
@@ -27,7 +28,7 @@ class _SignupScreenState extends State<SignupScreen> {
     print(response.body);
     var msg = json.decode(response.body);
     showAlertDialog(msg);
-  } 
+  }
 
   void showAlertDialog(Map<String, dynamic> msg) {
     showDialog(
@@ -60,7 +61,7 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ],
       ),
-    );                  
+    );
   }
 
   @override
@@ -124,7 +125,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       validator: (String val) {
                         if (val.isNotEmpty) {
                           bool isValidEmail = RegExp(
-                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@hcmut\.edu\.vn")
+                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@hcmut\.edu\.vn")
                               .hasMatch(val);
                           return isValidEmail ? null : "Invalid email address!";
                         }

@@ -1,19 +1,20 @@
-import 'dart:io';
-import 'dart:ui' as ui;
 import 'dart:convert';
-import 'package:bkconnect/view/components/image.dart';
-import 'package:bkconnect/controller/config.dart';
-import 'package:bkconnect/view/home_page.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_ml_vision/firebase_ml_vision.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as imglib;
-import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:io';
 import 'dart:math';
+import 'dart:ui' as ui;
+
+import 'package:bkconnect/controller/config.dart';
+import 'package:bkconnect/view/components/image.dart';
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as imglib;
+import 'package:image_picker/image_picker.dart';
 
 class GalleryView extends StatefulWidget {
   GalleryView() : super();
+
   @override
   _GalleryViewState createState() => _GalleryViewState();
 }
@@ -30,9 +31,10 @@ class _GalleryViewState extends State<GalleryView> {
   bool isLoading = false;
   ui.Image _image;
   Size _imageSize;
+
   void _getImageAndDetectFaces() async {
     final imageFilePicked =
-        await ImagePicker().getImage(source: ImageSource.gallery);
+    await ImagePicker().getImage(source: ImageSource.gallery);
     final File imageFile = File(imageFilePicked.path);
     setState(() {
       isLoading = true;
@@ -52,7 +54,7 @@ class _GalleryViewState extends State<GalleryView> {
   _loadImage(File file) async {
     final data = await file.readAsBytes();
     await decodeImageFromList(data).then(
-      (value) => setState(() {
+          (value) => setState(() {
         _image = value;
         isLoading = false;
         _imageSize = Size(
@@ -262,18 +264,18 @@ class _GalleryViewState extends State<GalleryView> {
         child: isLoading
             ? Center(child: CircularProgressIndicator())
             : (_imageFile == null)
-                ? Center(child: Text('No image selected'))
-                : Center(
-                    child: FittedBox(
-                      child: SizedBox(
-                        width: _image.width.toDouble(),
-                        height: _image.height.toDouble(),
-                        child: CustomPaint(
-                          painter: FacePainter(_image, _faces, _imageSize),
-                        ),
-                      ),
-                    ),
-                  ),
+            ? Center(child: Text('No image selected'))
+            : Center(
+          child: FittedBox(
+            child: SizedBox(
+              width: _image.width.toDouble(),
+              height: _image.height.toDouble(),
+              child: CustomPaint(
+                painter: FacePainter(_image, _faces, _imageSize),
+              ),
+            ),
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: Column(
@@ -309,6 +311,7 @@ class FacePainter extends CustomPainter {
   final List<Face> faces;
   final List<Rect> rects = [];
   final Size imageSize;
+
   FacePainter(this.image, this.faces, this.imageSize) {
     for (var i = 0; i < faces.length; i++) {
       rects.add(faces[i].boundingBox);
