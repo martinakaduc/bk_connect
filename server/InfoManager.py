@@ -38,7 +38,7 @@ class InfoManager:
 
     def updatePosition(self, username, position):
         self._collection.find_and_modify(query={"username" : username}, update={"$set":{"position": position}})
-       
+
 
     def printDB(self):
         for document in self._collection.find():

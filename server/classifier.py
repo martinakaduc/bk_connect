@@ -26,16 +26,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf
-import numpy as np
 import argparse
 import facenet
-import os
-import sys
 import math
+import numpy as np
+import os
 import pickle
-from sklearn.svm import SVC
+import sys
+import tensorflow as tf
 from sklearn.ensemble import RandomForestClassifier
+
 
 def main(args):
 

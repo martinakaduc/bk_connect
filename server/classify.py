@@ -1,13 +1,11 @@
-import tensorflow as tf
+import cv2
 import imageio
 import numpy as np
-import argparse
 import os
-import sys
-import math
 import pickle
 import re
-import cv2
+import tensorflow as tf
+
 
 class Classify():
     def __init__(self):
