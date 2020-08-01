@@ -1,4 +1,5 @@
 import pymongo, urllib.parse
+from werkzeug.security import check_password_hash
 
 
 class InfoManager:
@@ -13,8 +14,9 @@ class InfoManager:
         return True
 
     def authorizeSignIn(self, username, password):
-        if self._collection.count({"username": username, "password": password}) == 1:
-            return True
+        user = self.getUser(username)
+        if user != None:
+            return check_password_hash(user["password"], password)
         return False
 
     def addUser(self, info):
@@ -30,6 +32,13 @@ class InfoManager:
         self._collection.find_and_modify(query={"username" : username , "FriendList" : {"$exists":False}} , update={"$set":{"FriendList": [friendID]}})
         self._collection.find_and_modify(query={"username":username , "FriendList" : {"$exists":True}} , update={"$addToSet":{"FriendList":friendID}})
 
+    def removeUserInFriendList(self, username, friendID):
+        result = self._collection.update_one({"username": username}, update={"$pull": {"FriendList": friendID}})
+        return result.modified_count > 0
+
+    def updatePosition(self, username, position):
+        self._collection.find_and_modify(query={"username" : username}, update={"$set":{"position": position}})
+       
 
     def printDB(self):
         for document in self._collection.find():

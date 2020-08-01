@@ -27,40 +27,84 @@ class _SignupScreenState extends State<SignupScreen> {
     print(response.body);
     var msg = json.decode(response.body);
     showAlertDialog(msg);
-  } 
+  }
 
   void showAlertDialog(Map<String, dynamic> msg) {
     showDialog(
       context: context,
-      child: new AlertDialog(
-        title: Text(
-          msg["status"],
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: msg["status"] == "success" ? Colors.blue : Colors.red,
-            fontSize: 30,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Text(
-          msg["message"],
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 30,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        actions: [
-          new FlatButton(
-            child: const Text("OK"),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );                  
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(30.0))),
+          content: Builder(builder: (BuildContext context) {
+            var height = MediaQuery.of(context).size.height * 0.25;
+            var width = MediaQuery.of(context).size.width * 0.9;
+            return Container(
+              height: height,
+              width: width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    height: height * 0.15,
+                    child: Text(
+                      msg["status"] == "success" ? "Success!" : "Failure!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: msg["status"] == "success"
+                            ? Colors.blue
+                            : Colors.red,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.black,
+                  ),
+                  Spacer(),
+                  Container(
+                    child: Text(
+                      msg["message"],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  Divider(
+                    color: Colors.black,
+                  ),
+                  Container(
+                    height: height * 0.15,
+                    child: FlatButton(
+                      child: Text(
+                        "OK",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: msg["status"] == "success"
+                              ? Colors.blue
+                              : Colors.red,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        );
+      },
+    );
   }
 
   @override
@@ -178,11 +222,17 @@ class _SignupScreenState extends State<SignupScreen> {
                         size: 36.0,
                       ),
                       validator: (String val) {
-                        return val.isEmpty ? "Password does not match!" : null;
+                        if (val.isNotEmpty) {
+                          return val == _info.getPassword()
+                              ? null
+                              : "Password does not match!";
+                        } else {
+                          return "Please confirm your password in order to register!";
+                        }
                       },
-                      onSave: (String val) {
-                        _info.setPassword(val);
-                      },
+                      // onSave: (String val) {
+                      //   _info.setPassword(val);
+                      // },
                     ),
                     SizedBox(height: 45),
                     FormField(
@@ -206,14 +256,18 @@ class _SignupScreenState extends State<SignupScreen> {
                               48,
                               fontSize: 20,
                               onTapFunction: () async {
+                                _key.currentState.save();
                                 if (_key.currentState.validate()) {
-                                  _key.currentState.save();
+                                  //_key.currentState.save();
                                   try {
                                     var response = await _auth.signUp(_info);
                                     submitCallback(response);
-                                  } catch(e) {
+                                  } catch (e) {
                                     print(e);
-                                    var msg = {"status": "failure", "message": "lost connection"};
+                                    var msg = {
+                                      "status": "failure",
+                                      "message": "lost connection"
+                                    };
                                     showAlertDialog(msg);
                                   }
                                 }

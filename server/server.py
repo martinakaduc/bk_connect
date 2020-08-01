@@ -11,6 +11,9 @@ import io
 import classify
 import preprocess
 import cv2
+from werkzeug.security import generate_password_hash
+
+
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'this is a secret key'
 revoked_tokens = []
@@ -97,6 +100,8 @@ def convert_to_array(b64_string):
     # cv2.imshow('dcm', np.array(image))
     # bb, pp_image, run_detect = preprocessor.align(image)
     return np.array(image)
+
+
 @app.route("/register/", methods=["POST"])
 def register():
     user = request.json
@@ -106,6 +111,7 @@ def register():
         return jsonify(msg)
 
     if infoManager.authorizeSignUp(username=user["username"]):
+        user["password"] = generate_password_hash(user["password"], "sha256")   # hash password
         infoManager.addUser(user)
         msg = {"status": "success", "message": "registered successfully"}
         return jsonify(msg)
@@ -144,6 +150,17 @@ def getFriendList():
     return jsonify(msg)
 
 
+@app.route("/delete_friend/", methods=["POST"])
+@jwt_required
+def delete_friend():
+    username = get_jwt_identity()
+    friendID = request.json["id"]
+    is_successful = infoManager.removeUserInFriendList(username=username, friendID=friendID)
+    msg = {"status": "failure"}
+    if is_successful:
+        msg = {"status": "success"}
+    return jsonify(msg)
+
 @app.route("/profile/", methods=["GET"])
 @jwt_required
 def send_profile():
@@ -157,10 +174,36 @@ def send_profile():
     }
     return jsonify(msg)
 
-# @app.route("/update_position", methods=["POST"])
-# @jwt_required
-# def update_position():
-#     username = get_jwt_identity()
+@app.route("/update_position/", methods=["POST"])
+@jwt_required
+def update_position():
+    username = get_jwt_identity()
+    # Update position
+    position = {
+        "latitude": request.json["latitude"],
+        "longitude": request.json["longitude"]
+    }
+    print(position)
+    infoManager.updatePosition(username=username, position=position)
+    # Get friends's position
+    user = infoManager.getUser(username=username)
+    friends_position = []
+    if "FriendList" in user:
+        friendList = user["FriendList"]
+        for friendID in friendList :
+            friend = infoManager.getUserViaID(friendID)
+            if "position" in friend:
+                info = {
+                    "username": friend["username"],
+                    "latitude": friend["position"]["latitude"],
+                    "longitude": friend["position"]["longitude"]
+                }
+                friends_position.append(info)
+    msg = {
+        "friends_position": friends_position,
+    }
+
+    return jsonify(msg)
 
 
 if __name__ == "__main__":

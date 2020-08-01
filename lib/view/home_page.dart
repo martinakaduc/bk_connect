@@ -11,6 +11,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:bkconnect/controller/config.dart';
 import 'package:bkconnect/view/components/text.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:bkconnect/view/login_screen.dart';
 
 class HomePage extends StatefulWidget {
   HomePage() : super();
@@ -38,6 +40,35 @@ class _HomePageState extends State<HomePage> {
     // print(infos[0].getEmail());
   }
 
+  Widget loginNavigation() {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+          color: Colors.white),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          NormalText("Token has expired. Please login again"),
+          SizedBox(
+            height: 30,
+          ),
+          Button(
+            "Login",
+            124,
+            48,
+            fontSize: 20,
+            onTapFunction: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -51,6 +82,14 @@ class _HomePageState extends State<HomePage> {
         }
         if (!snapshot.hasData) {
           return Center(child: NormalText('Nothing to show'));
+        }
+
+        final int statusCode = snapshot.data.statusCode;
+        if (statusCode > 299) {
+          if (statusCode == 401) {
+            return loginNavigation();
+          }
+          return Center(child: NormalText('Error: $statusCode'));
         }
         var responseBody = json.decode(snapshot.data.body);
         var friendList = responseBody["infoFriends"];
@@ -256,32 +295,233 @@ class InformationCard extends StatelessWidget {
           right: 20,
           child: IconButton(
             icon: Icon(Icons.more_horiz),
-            onPressed: () => _settingModalBottomSheet(context),
+            onPressed: () => _settingModalBottomSheet(context, info),
           ),
         ),
       ],
     );
   }
 
-  void _settingModalBottomSheet(context) {
+  void _settingModalBottomSheet(context, MemberInfo info) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
           return Container(
-            child: new Wrap(
+            height: 330,
+            child: Column(
               children: <Widget>[
-                new ListTile(
-                    leading: new Icon(Icons.music_note),
-                    title: new Text('Music'),
-                    onTap: () => {}),
-                new ListTile(
-                  leading: new Icon(Icons.videocam),
-                  title: new Text('Video'),
-                  onTap: () => {},
+                InfoMenuCard(
+                  image: 'assets/images/save_icon.png',
+                  title: 'Save to contact',
+                  text: 'Save this people to phone contact',
+                  onTap: () {
+                    savePhone(info.getPhone());
+                  },
                 ),
+                InfoMenuCard(
+                  image: 'assets/images/share_icon.png',
+                  title: 'Share contact',
+                  text: 'Share this contact to your friend',
+                ),
+                InfoMenuCard(
+                  image: 'assets/images/call_icon.png',
+                  title: 'Call',
+                  text: 'Try to make connection by calling',
+                  onTap: () {
+                    makePhoneCall(info.getPhone());
+                  },
+                ),
+                InfoMenuCard(
+                  image: 'assets/images/delete_icon.png',
+                  title: 'Delete',
+                  text: 'Remove this contact in recognized',
+                  onTap: () async {
+                    var success = await removeFriend(info.getID());
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0))),
+                          content: Builder(builder: (BuildContext context) {
+                            var height =
+                                MediaQuery.of(context).size.height * 0.25;
+                            var width = MediaQuery.of(context).size.width * 0.9;
+                            return Container(
+                              height: height,
+                              width: width,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Container(
+                                    height: height * 0.15,
+                                    child: Text(
+                                      success ? "Success!" : "Failure!",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color:
+                                            success ? Colors.blue : Colors.red,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  Divider(
+                                    color: Colors.black,
+                                  ),
+                                  Spacer(),
+                                  Container(
+                                    child: Text(
+                                      success
+                                          ? "Đã xóa thành công"
+                                          : "Chưa xóa được",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Divider(
+                                    color: Colors.black,
+                                  ),
+                                  Container(
+                                    height: height * 0.15,
+                                    child: FlatButton(
+                                      child: Text(
+                                        "OK",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: success
+                                              ? Colors.blue
+                                              : Colors.red,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                    );
+                  },
+                )
               ],
             ),
           );
         });
+  }
+
+  void makePhoneCall(String phoneNumber) {
+    launch("tel://" + phoneNumber);
+  }
+
+  void savePhone(String phoneNumber) {
+    launch("tel://" + phoneNumber);
+  }
+
+  Future<bool> removeFriend(String id) async {
+    var storage = FlutterSecureStorage();
+    var token = await storage.read(key: "token");
+    try {
+      var body = {"id": id};
+      var response = await http.post(base_url + "/delete_friend/",
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json"
+          },
+          body: json.encode(body));
+      print(response.body);
+      return json.decode(response.body)["status"] == "success" ? true : false;
+    } catch (e) {
+      print("Delete Error");
+    }
+  }
+}
+
+class InfoMenuCard extends StatelessWidget {
+  InfoMenuCard({Key key, this.image, this.title, this.text, this.onTap})
+      : super(key: key);
+  final String title;
+  final String text;
+  final String image;
+  final GestureTapCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xffe0e0e0), width: 1),
+        ),
+        child: Card(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.all(5),
+                child: GeneralImage(
+                  50,
+                  this.image,
+                  round: true,
+                ),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          this.title,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 24.0),
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          this.text,
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: "Roboto",
+                              fontStyle: FontStyle.normal,
+                              fontSize: 18.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

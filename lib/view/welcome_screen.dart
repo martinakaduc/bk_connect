@@ -2,6 +2,10 @@ import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/view/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:bkconnect/controller/config.dart';
+import 'package:bkconnect/view/main_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   WelcomeScreen() : super();
@@ -40,11 +44,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               284,
               48,
               fontSize: 36,
-              onTapFunction: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
+              onTapFunction: () async {
+                var storage = FlutterSecureStorage();
+                // storage.delete(key: "token");
+                var token = await storage.read(key: "token");
+                print(token);
+                if (token == null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MainScreen()),
+                  );
+                }
               },
             ),
           ],
