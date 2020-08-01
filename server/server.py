@@ -42,7 +42,7 @@ def login():
     if user["username"] == None or user["password"] == None:
         msg = {"status": "failure", "message": "incomplete login information"}
         return jsonify(msg)
-    
+
     if infoManager.authorizeSignIn(username=user["username"], password=user["password"]):
         token = create_access_token(identity=user["username"], expires_delta=datetime.timedelta(days=1))
         msg = {
@@ -54,13 +54,13 @@ def login():
     else:
         msg = {"status": "failure", "message": "invalid username or password"}
         return jsonify(msg)
-            
+
 @app.route("/recognize/", methods = ["POST"])
 @jwt_required
 def recognize():
     threshold = 0.2
     data = request.get_json()
-    
+
     # print(data)
     if data is None:
         print("No valid request body, json missing!")
@@ -81,10 +81,10 @@ def recognize():
         "username": user["username"],
         "id": user["id"],
         "email": user["email"],
-        "phone": user["phone"],          
+        "phone": user["phone"],
         }
         return jsonify(msg)
-   
+
 
 
 def convert_to_array(b64_string):
@@ -93,7 +93,7 @@ def convert_to_array(b64_string):
     tmp = base64.b64decode(b64_string)
     # print(tmp)
     image = Image.open(io.BytesIO(tmp))
-    
+
     # cv2.imshow('dcm', np.array(image))
     # bb, pp_image, run_detect = preprocessor.align(image)
     return np.array(image)
@@ -134,13 +134,13 @@ def getFriendList():
                 "username": tempInfo["username"],
                 "id": tempInfo["id"],
                 "email": tempInfo["email"],
-                "phone": tempInfo["phone"],      
+                "phone": tempInfo["phone"],
             }
             infoFriends.append(info)
     msg = {
         "infoFriends": infoFriends,
     }
-    
+
     return jsonify(msg)
 
 
@@ -153,7 +153,7 @@ def send_profile():
         "username": user["username"],
         "id": user["id"],
         "email": user["email"],
-        "phone": user["phone"],          
+        "phone": user["phone"],
     }
     return jsonify(msg)
 
