@@ -12,6 +12,7 @@ import 'package:image/image.dart' as imglib;
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:io';
 
 class CameraView extends StatefulWidget {
   CameraView() : super();
@@ -46,7 +47,7 @@ class _CameraViewState extends State<CameraView> {
       description.sensorOrientation,
     );
 
-    _controller = CameraController(description, ResolutionPreset.high);
+    _controller = CameraController(description, Platform.isAndroid ? ResolutionPreset.high : ResolutionPreset.medium);
     await _controller.initialize();
     if (!mounted) {
       return;

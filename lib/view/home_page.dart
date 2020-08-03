@@ -6,6 +6,7 @@ import 'package:bkconnect/view/camera.dart';
 import 'package:bkconnect/view/components/button.dart';
 import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/view/gallery.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -13,6 +14,8 @@ import 'package:bkconnect/controller/config.dart';
 import 'package:bkconnect/view/components/text.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bkconnect/view/login_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:contacts_service/contacts_service.dart';
 
 class HomePage extends StatefulWidget {
   HomePage() : super();
@@ -314,8 +317,93 @@ class InformationCard extends StatelessWidget {
                   image: 'assets/images/save_icon.png',
                   title: 'Save to contact',
                   text: 'Save this people to phone contact',
-                  onTap: () {
-                    savePhone(info.getPhone());
+                  onTap: () async {
+                    final PermissionStatus permissionStatus =
+                        await _getPermission();
+                    if (permissionStatus == PermissionStatus.granted) {
+                      //We can now access our contacts here
+                      saveContact(info).then((value) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0))),
+                              content: Builder(builder: (BuildContext context) {
+                                var height =
+                                    MediaQuery.of(context).size.height * 0.25;
+                                var width =
+                                    MediaQuery.of(context).size.width * 0.9;
+                                return Container(
+                                  height: height,
+                                  width: width,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Container(
+                                        height: height * 0.15,
+                                        child: Text(
+                                          "Success!",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.blue,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      Divider(
+                                        color: Colors.black,
+                                      ),
+                                      Spacer(),
+                                      Container(
+                                        child: Text(
+                                          "Đã lưu thành công vào danh bạ",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Divider(
+                                        color: Colors.black,
+                                      ),
+                                      Container(
+                                        height: height * 0.15,
+                                        child: FlatButton(
+                                          child: Text(
+                                            "OK",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.blue,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            );
+                          },
+                        );
+                      });
+                    } else {
+                      //If permissions have been denied show standard cupertino alert dialog
+                      print("permission error");
+                    }
                   },
                 ),
                 InfoMenuCard(
@@ -337,6 +425,16 @@ class InformationCard extends StatelessWidget {
                   text: 'Remove this contact in recognized',
                   onTap: () async {
                     var success = await removeFriend(info.getID());
+                    if (success) {
+                      final PermissionStatus permissionStatus =
+                          await _getPermission();
+                      if (permissionStatus == PermissionStatus.granted) {
+                        await deleteContact(info);
+                      } else {
+                        //If permissions have been denied show standard cupertino alert dialog
+                        print("permission error");
+                      }
+                    }
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -428,8 +526,42 @@ class InformationCard extends StatelessWidget {
     launch("tel://" + phoneNumber);
   }
 
-  void savePhone(String phoneNumber) {
-    launch("tel://" + phoneNumber);
+  Future<PermissionStatus> _getPermission() async {
+    final PermissionStatus permission = await Permission.contacts.status;
+    if (permission != PermissionStatus.granted &&
+        permission != PermissionStatus.denied) {
+      final Map<Permission, PermissionStatus> permissionStatus =
+          await [Permission.contacts].request();
+      return permissionStatus[Permission.contacts] ??
+          PermissionStatus.undetermined;
+    } else {
+      return permission;
+    }
+  }
+
+  Future saveContact(MemberInfo info) async {
+    Contact newContact = new Contact();
+    newContact.givenName = info.getName();
+    newContact.emails = [Item(label: "email", value: info.getEmail())];
+    newContact.company = info.getFaculty() + " Bách Khoa";
+    newContact.phones = [Item(label: "mobile", value: info.getPhone())];
+    return await ContactsService.addContact(newContact);
+  }
+
+  Future deleteContact(MemberInfo info) async {
+    Iterable<Contact> contacts =
+        await ContactsService.getContacts(query: info.getName());
+    var contactList = contacts.toList();
+    for (var contact in contactList) {
+      if (contact.emails.length == 0 || contact.phones.length == 0) {
+        continue;
+      }
+      if (contact.emails.elementAt(0).value == info.getEmail() &&
+          contact.phones.elementAt(0).value == info.getPhone()) {
+        return await ContactsService.deleteContact(contact);
+      }
+    }
+    return Future;
   }
 
   Future<bool> removeFriend(String id) async {
