@@ -8,7 +8,7 @@ import 'package:bkconnect/controller/config.dart';
 import 'dart:convert';
 
 const double CAMERA_ZOOM = 20.0;
-const int POSITON_UPDATE_TIME_INTERVAL = 1000;
+const int POSITON_UPDATE_TIME_INTERVAL = 100;
 
 class NearbyPage extends StatefulWidget {
   NearbyPage();
@@ -105,17 +105,24 @@ class _NearbyPageState extends State<NearbyPage> {
           marker.markerId.value !=
               _bk2.toString()); // remove all old friends' position
       for (var friend in friends) {
-        _markers.add(Marker(
-          // update current pin
-          // This marker id can be anything that uniquely identifies each marker.
-          markerId: MarkerId(friend.username),
-          position: LatLng(friend.latitude, friend.longitude),
-          infoWindow: InfoWindow(
-            title: friend.username,
-          ),
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        ));
+        Geolocator()
+            .distanceBetween(currentPosition.latitude,
+                currentPosition.longitude, friend.latitude, friend.longitude)
+            .then((distance) {
+          if (distance <= 200) {
+            _markers.add(Marker(
+              // update current pin
+              // This marker id can be anything that uniquely identifies each marker.
+              markerId: MarkerId(friend.username),
+              position: LatLng(friend.latitude, friend.longitude),
+              infoWindow: InfoWindow(
+                title: friend.username,
+              ),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueGreen),
+            ));
+          }
+        });
       }
     });
   }
