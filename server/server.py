@@ -75,7 +75,7 @@ def recognize():
         studentID = classifier.predict(image_array, threshold)
         if(studentID == 'Unknown face'):
             print(studentID)
-            return
+            return jsonify(False)
         user = infoManager.getUserViaID(studentID)
         if studentID != 'Unknown face':
             print("a")

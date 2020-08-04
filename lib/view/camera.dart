@@ -219,9 +219,9 @@ class _CameraViewState extends State<CameraView> {
                 backgroundColor: const Color(0xf2f6f7f5),
                 // insetPadding:
                 //     EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-                title: Text("Success!",
-                    style: const TextStyle(
-                        color: const Color(0xff1588db),
+                title: Text((responseJson ==  false) ? "Failure!" : "Success!",
+                    style: TextStyle(
+                        color: (responseJson ==  false) ? Colors.red : Color(0xff1588db),
                         fontWeight: FontWeight.w700,
                         fontFamily: "Roboto",
                         fontStyle: FontStyle.normal,
@@ -236,7 +236,21 @@ class _CameraViewState extends State<CameraView> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
+                  children: (responseJson ==  false) ?
+                  <Widget>[
+                    Container(
+                      child: Text(
+                        "Không thể nhận diện được!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),]
+                      :
+                  <Widget>[
                     GeneralImage(
                       MediaQuery.of(context).size.width * 0.5,
                       'assets/images/TC_Avatar.png',
