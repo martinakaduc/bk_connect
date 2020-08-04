@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'dart:io';
 
 import 'package:bkconnect/controller/info.dart';
 import 'package:bkconnect/view/camera.dart';
@@ -16,6 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:bkconnect/view/login_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_appavailability/flutter_appavailability.dart';
 
 class HomePage extends StatefulWidget {
   HomePage() : super();
@@ -410,6 +412,9 @@ class InformationCard extends StatelessWidget {
                   image: 'assets/images/share_icon.png',
                   title: 'Share contact',
                   text: 'Share this contact to your friend',
+                  onTap: () {
+                    openEmailApp(context);
+                  },
                 ),
                 InfoMenuCard(
                   image: 'assets/images/call_icon.png',
@@ -524,6 +529,23 @@ class InformationCard extends StatelessWidget {
 
   void makePhoneCall(String phoneNumber) {
     launch("tel://" + phoneNumber);
+  }
+
+  void openEmailApp(BuildContext context) {
+    try {
+      AppAvailability.launchApp(
+              Platform.isIOS ? "message://" : "com.google.android.gm")
+          .then((_) {
+        print("App Email launched!");
+      }).catchError((err) {
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text("App Email not found!")));
+        print(err);
+      });
+    } catch (e) {
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text("Email App not found!")));
+    }
   }
 
   Future<PermissionStatus> _getPermission() async {
