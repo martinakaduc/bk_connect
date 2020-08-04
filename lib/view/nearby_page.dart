@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-import 'package:bkconnect/controller/config.dart';
 import 'dart:convert';
 
+import 'package:bkconnect/controller/config.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+
 const double CAMERA_ZOOM = 20.0;
-const int POSITON_UPDATE_TIME_INTERVAL = 1000;
+const int POSITON_UPDATE_TIME_INTERVAL = 100;
 
 class NearbyPage extends StatefulWidget {
   NearbyPage();
@@ -59,7 +60,7 @@ class _NearbyPageState extends State<NearbyPage> {
     controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     setState(() {
       _markers.removeWhere((marker) =>
-          marker.markerId.value == "current pin"); // remove previous pin
+      marker.markerId.value == "current pin"); // remove previous pin
       _markers.add(Marker(
         // update current pin
         // This marker id can be anything that uniquely identifies each marker.
@@ -100,22 +101,29 @@ class _NearbyPageState extends State<NearbyPage> {
   void updatePins(List<Friend> friends) {
     setState(() {
       _markers.removeWhere((marker) =>
-          marker.markerId.value != "current pin" &&
+      marker.markerId.value != "current pin" &&
           marker.markerId.value != _bk1.toString() &&
           marker.markerId.value !=
               _bk2.toString()); // remove all old friends' position
       for (var friend in friends) {
-        _markers.add(Marker(
-          // update current pin
-          // This marker id can be anything that uniquely identifies each marker.
-          markerId: MarkerId(friend.username),
-          position: LatLng(friend.latitude, friend.longitude),
-          infoWindow: InfoWindow(
-            title: friend.username,
-          ),
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        ));
+        Geolocator()
+            .distanceBetween(currentPosition.latitude,
+            currentPosition.longitude, friend.latitude, friend.longitude)
+            .then((distance) {
+          if (distance <= 200) {
+            _markers.add(Marker(
+              // update current pin
+              // This marker id can be anything that uniquely identifies each marker.
+              markerId: MarkerId(friend.username),
+              position: LatLng(friend.latitude, friend.longitude),
+              infoWindow: InfoWindow(
+                title: friend.username,
+              ),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueGreen),
+            ));
+          }
+        });
       }
     });
   }
@@ -152,7 +160,7 @@ class _NearbyPageState extends State<NearbyPage> {
   @override
   Widget build(BuildContext context) {
     CameraPosition initialCameraPosition =
-        CameraPosition(target: _bk1, zoom: CAMERA_ZOOM);
+    CameraPosition(target: _bk1, zoom: CAMERA_ZOOM);
     if (currentPosition != null) {
       initialCameraPosition = CameraPosition(
         target: LatLng(currentPosition.latitude, currentPosition.longitude),
