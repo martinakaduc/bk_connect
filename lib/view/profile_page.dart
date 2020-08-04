@@ -196,6 +196,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     160,
                     48,
                     onTapFunction: () {
+                      var storage = FlutterSecureStorage();
+                      storage.delete(key: "token");
                       Navigator.pop(context);
                     },
                   ),
