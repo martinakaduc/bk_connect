@@ -57,7 +57,7 @@ class _NearbyPageState extends State<NearbyPage> {
       target: LatLng(currentPosition.latitude, currentPosition.longitude),
       zoom: CAMERA_ZOOM,
     );
-    controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+//    controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     setState(() {
       _markers.removeWhere((marker) =>
       marker.markerId.value == "current pin"); // remove previous pin

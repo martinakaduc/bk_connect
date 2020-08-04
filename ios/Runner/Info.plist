@@ -48,8 +48,8 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
+	<false/>
 	<key>io.flutter.embedded_views_preview</key>
-	<true/>
+    <string>YES</string>
 </dict>
 </plist>
