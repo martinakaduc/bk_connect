@@ -1,5 +1,5 @@
 import 'package:bkconnect/controller/info.dart';
-import 'package:bkconnect/view/components/button.dart';
+import 'package:bkconnect/view/components/button.dart' as CustomButton;
 import 'package:bkconnect/view/components/image.dart';
 import 'package:bkconnect/view/components/input.dart';
 import 'package:bkconnect/view/components/text.dart';
@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Button(
+                            CustomButton.Button(
                               "Cancel",
                               124,
                               48,
@@ -218,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                             SizedBox(width: 50),
-                            Button(
+                            CustomButton.Button(
                               "Login",
                               124,
                               48,
@@ -248,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        TextButton(
+                        CustomButton.TextButton(
                           "Forgot password?",
                           onTapFunction: () {
                             Navigator.push(
@@ -268,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         NormalText(
                           "Do not have an account? ",
                         ),
-                        TextButton(
+                        CustomButton.TextButton(
                           "Sign up",
                           onTapFunction: () {
                             Navigator.push(

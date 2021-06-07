@@ -532,43 +532,43 @@ class InformationCard extends StatelessWidget {
     launch("tel://" + phoneNumber);
   }
 
-  void shareInfo(MemberInfo info, BuildContext context) {
-    var emailController = new TextEditingController();
-    showDialog(
-        context: context,
-        child: Dialog(
-          child: Column(
-            children: <Widget>[
-              TextField(
-                decoration: new InputDecoration(hintText: "Type email here..."),
-                controller: emailController,
-              ),
-              FlatButton(
-                  onPressed: () async {
-                    print(emailController.text);
-                    var body = {
-                      "recipient_email": emailController.text,
-                      "info": {
-                        "name": info.getName(),
-                        "id": info.getID(),
-                      }
-                    };
-                    var storage = FlutterSecureStorage();
-                    var token = await storage.read(key: "token");
-                    var header = {
-                      "Authorization": "Bearer $token",
-                      "Content-Type": "application/json"
-                    };
-                    final url = base_url + '/share/';
-                    var response = await http.post(url,
-                        headers: header, body: jsonEncode(body));
-                    print(response);
-                  },
-                  child: Text("Share"))
-            ],
-          ),
-        ));
-  }
+  // void shareInfo(MemberInfo info, BuildContext context) {
+  //   var emailController = new TextEditingController();
+  //   showDialog(
+  //       context: context,
+  //       child: Dialog(
+  //         child: Column(
+  //           children: <Widget>[
+  //             TextField(
+  //               decoration: new InputDecoration(hintText: "Type email here..."),
+  //               controller: emailController,
+  //             ),
+  //             FlatButton(
+  //                 onPressed: () async {
+  //                   print(emailController.text);
+  //                   var body = {
+  //                     "recipient_email": emailController.text,
+  //                     "info": {
+  //                       "name": info.getName(),
+  //                       "id": info.getID(),
+  //                     }
+  //                   };
+  //                   var storage = FlutterSecureStorage();
+  //                   var token = await storage.read(key: "token");
+  //                   var header = {
+  //                     "Authorization": "Bearer $token",
+  //                     "Content-Type": "application/json"
+  //                   };
+  //                   final url = base_url + '/share/';
+  //                   var response = await http.post(url,
+  //                       headers: header, body: jsonEncode(body));
+  //                   print(response);
+  //                 },
+  //                 child: Text("Share"))
+  //           ],
+  //         ),
+  //       ));
+  // }
 
   void openEmailApp(BuildContext context) {
     try {
